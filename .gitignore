@@ -1,7 +1,7 @@
 node_modules/
 .env
 chrome-temp-profile/
-.claude
+.claude/
 server/uploads/*.pdf
 server/uploads/*.docx
 server/uploads/
