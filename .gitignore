@@ -1,10 +1,10 @@
 node_modules/
 .env
 chrome-temp-profile/
-server/data/extracted-results.json
-server/data/sent-emails.json
-server/data/sent-dms.json
+.claude
 server/uploads/*.pdf
+server/uploads/*.docx
+server/uploads/
 .DS_Store
 dist/
 *.log

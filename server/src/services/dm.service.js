@@ -76,7 +76,7 @@ async function sendDirectMessage(page, messageButton, message, index, total) {
     await page.evaluate((btn) => btn.click(), messageButton);
     await randomSleep(3000, 5000);
 
-    // Wait for any compose/modal to appear
+    // Wait for compose to appear
     let composeFound = false;
     for (let attempt = 0; attempt < 3 && !composeFound; attempt++) {
       if (attempt > 0) await sleep(2000);
@@ -110,30 +110,14 @@ async function sendDirectMessage(page, messageButton, message, index, total) {
 
     await randomSleep(300, 600);
 
-    // DEBUG: Log all elements in compose area
-    const debugInfo = await page.evaluate(() => {
-      const info = [];
-      // Find all interactive elements in the compose area
-      const allElements = document.querySelectorAll('div[contenteditable], [role="textbox"], textarea, input, [class*="msg-form"], [class*="msg-overlay"], [class*="compose"]');
-      allElements.forEach((el) => {
-        if (el.offsetHeight > 0) {
-          info.push({
-            tag: el.tagName,
-            class: el.className?.toString().substring(0, 80),
-            contenteditable: el.getAttribute('contenteditable'),
-            role: el.getAttribute('role'),
-            placeholder: el.getAttribute('placeholder') || el.getAttribute('aria-placeholder') || el.getAttribute('data-placeholder'),
-            ariaLabel: el.getAttribute('aria-label'),
-            type: el.getAttribute('type'),
-            height: el.offsetHeight,
-            width: el.offsetWidth,
-            text: (el.innerText || '').substring(0, 30),
-          });
-        }
+    // Disable the drag-and-drop overlay that blocks mouse clicks on the message body
+    await page.evaluate(() => {
+      document.querySelectorAll('[class*="msg-form__attachment-drag"], [class*="attachment-drag-and-drop"]').forEach((el) => {
+        el.style.pointerEvents = 'none';
+        el.style.zIndex = '-1';
       });
-      return info;
     });
-    console.log('DEBUG compose elements:', JSON.stringify(debugInfo, null, 2));
+    await sleep(300);
 
     // Handle Subject field if present (InMail / Free message)
     const hasSubject = await page.evaluate(() => {
@@ -147,47 +131,105 @@ async function sendDirectMessage(page, messageButton, message, index, total) {
         await sleep(300);
         await page.keyboard.type('Regarding the open role', { delay: 15 });
         await sleep(500);
+        // Tab from Subject to body — natural focus transition
+        await page.keyboard.press('Tab');
+        await sleep(800);
       } catch {}
     }
 
-    // Focus message body using JavaScript (mouse click blocked by drag-drop overlay)
-    await page.evaluate(() => {
-      const el = document.querySelector('div.msg-form__contenteditable');
-      if (el) {
-        el.focus();
-        // Place cursor inside the contenteditable
-        const range = document.createRange();
-        range.selectNodeContents(el);
-        range.collapse(false);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
+    // Find the deepest editable element inside the compose box
+    const editableSelector = await page.evaluate(() => {
+      // Try innermost textbox first, then work outward
+      const candidates = [
+        'div.msg-form__contenteditable div[role="textbox"]',
+        'div.msg-form__contenteditable div[contenteditable="true"]',
+        'div.msg-form__contenteditable[contenteditable="true"]',
+        'div[role="textbox"][contenteditable="true"]',
+      ];
+      for (const sel of candidates) {
+        const el = document.querySelector(sel);
+        if (el && el.offsetHeight > 0) return sel;
       }
-    });
-    await sleep(500);
-
-    // Type message using keyboard
-    await page.keyboard.type(message, { delay: 20 });
-    await sleep(800);
-
-    // Verify message was typed
-    let typed = await page.evaluate(() => {
-      const el = document.querySelector('div.msg-form__contenteditable');
-      return el && el.innerText.trim().length > 5;
+      return null;
     });
 
-    // Fallback: direct DOM injection if keyboard didn't work
+    let typed = false;
+
+    // Strategy 1: Click (overlay disabled) + keyboard.type
+    if (!typed && editableSelector) {
+      try {
+        await page.click(editableSelector);
+        await sleep(400);
+        await page.keyboard.type(message, { delay: 18 });
+        await sleep(500);
+        typed = await page.evaluate(() => {
+          const el = document.querySelector('div.msg-form__contenteditable');
+          return el && el.innerText.trim().length > 5;
+        });
+      } catch {}
+    }
+
+    // Strategy 2: JS focus + execCommand('insertText')
     if (!typed) {
-      typed = await page.evaluate((msg) => {
+      typed = await page.evaluate((msg, sel) => {
+        const target = sel ? document.querySelector(sel) : document.querySelector('div.msg-form__contenteditable');
+        if (!target) return false;
+        target.focus();
+        target.innerHTML = '';
+        const ok = document.execCommand('insertText', false, msg);
+        return ok && target.innerText.trim().length > 5;
+      }, message, editableSelector);
+      await sleep(300);
+    }
+
+    // Strategy 3: Tab from subject (if subject exists) already done above, now try keyboard
+    if (!typed && hasSubject) {
+      // Focus might already be on body from Tab above
+      await page.keyboard.type(message, { delay: 18 });
+      await sleep(500);
+      typed = await page.evaluate(() => {
         const el = document.querySelector('div.msg-form__contenteditable');
-        if (el) {
-          el.focus();
-          el.innerHTML = '<p>' + msg.replace(/\n/g, '</p><p>') + '</p>';
-          el.dispatchEvent(new Event('input', { bubbles: true }));
-          return el.innerText.trim().length > 5;
+        return el && el.innerText.trim().length > 5;
+      });
+    }
+
+    // Strategy 4: JS focus + Range + keyboard.type
+    if (!typed) {
+      await page.evaluate((sel) => {
+        const target = sel ? document.querySelector(sel) : document.querySelector('div.msg-form__contenteditable');
+        if (target) {
+          target.focus();
+          target.innerHTML = '';
+          const range = document.createRange();
+          range.selectNodeContents(target);
+          range.collapse(false);
+          const s = window.getSelection();
+          s.removeAllRanges();
+          s.addRange(range);
+        }
+      }, editableSelector);
+      await sleep(400);
+      await page.keyboard.type(message, { delay: 18 });
+      await sleep(500);
+      typed = await page.evaluate(() => {
+        const el = document.querySelector('div.msg-form__contenteditable');
+        return el && el.innerText.trim().length > 5;
+      });
+    }
+
+    // Strategy 5: DOM injection + input event
+    if (!typed) {
+      typed = await page.evaluate((msg, sel) => {
+        const target = sel ? document.querySelector(sel) : document.querySelector('div.msg-form__contenteditable');
+        if (target) {
+          target.focus();
+          target.innerHTML = '<p>' + msg.replace(/\n/g, '</p><p>') + '</p>';
+          target.dispatchEvent(new Event('input', { bubbles: true }));
+          target.dispatchEvent(new Event('change', { bubbles: true }));
+          return target.innerText.trim().length > 5;
         }
         return false;
-      }, message);
+      }, message, editableSelector);
     }
 
     if (!typed) {
