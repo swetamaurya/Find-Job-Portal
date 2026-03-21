@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(npm install:*)",
+      "Bash(timeout 5 node:*)",
+      "Bash(node -e:*)",
+      "Bash(npx vite build)",
+      "Bash(python3:*)",
+      "Bash(node src/migrate-to-mongo.js:*)",
+      "Bash(timeout 10 node:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(npx:*)",
+      "Bash(ls:*)"
+    ]
+  }
+}
