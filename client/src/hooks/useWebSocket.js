@@ -30,7 +30,11 @@ export function useWebSocket() {
       if (msg.type === 'search:started') setSearchProgress({ running: true, current: 0, total: msg.totalQueries, query: '' });
       if (msg.type === 'search:query-start') setSearchProgress({ running: true, current: msg.index, total: msg.total, query: msg.query });
       if (msg.type === 'search:scroll') setSearchProgress((prev) => ({ ...prev, scroll: msg.scroll, scrollTotal: msg.total }));
-      if (msg.type === 'search:query-complete') setSearchProgress((prev) => ({ ...prev, totalEmails: msg.totalEmails, totalProfiles: msg.totalProfiles }));
+      if (msg.type === 'search:query-complete') setSearchProgress((prev) => ({
+        ...prev, totalEmails: msg.totalEmails, totalProfiles: msg.totalProfiles,
+        newEmails: msg.newEmails, alreadySentEmails: msg.alreadySentEmails,
+        newProfiles: msg.newProfiles, alreadyDMedProfiles: msg.alreadyDMedProfiles,
+      }));
       if (msg.type === 'search:complete') setSearchProgress({
         running: false, totalEmails: msg.totalEmails, totalProfiles: msg.totalProfiles,
         newEmails: msg.newEmails, alreadySentEmails: msg.alreadySentEmails,

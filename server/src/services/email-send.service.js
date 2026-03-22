@@ -40,9 +40,9 @@ function generateEmailHTML(user, cfg) {
 
   let expLine = '';
   if (experience) {
-    expLine = `<p>I'm <strong>${name}</strong> — I've been working as a ${role} for ${experience}${skills ? `, primarily with ${skills}` : ''}.</p>`;
+    expLine = `<p>I'm <strong>${name}</strong> — I've been working as a <strong>${role}</strong> for <strong>${experience}</strong>${skills ? `, primarily with ${skills}` : ''}.</p>`;
   } else {
-    expLine = `<p>I'm <strong>${name}</strong>, a ${role}${skills ? ` skilled in ${skills}` : ''}.</p>`;
+    expLine = `<p>I'm <strong>${name}</strong>, a <strong>${role}</strong>${skills ? ` skilled in ${skills}` : ''}.</p>`;
   }
 
   let linksHtml = '';
@@ -157,9 +157,9 @@ async function sendEmails(userId, emailList) {
   state.isSending = true;
   state.shouldStop = false;
 
+  try {
   const user = await User.findById(userId).lean();
   if (!user || !user.senderEmail || !user.gmailAppPassword) {
-    state.isSending = false;
     throw new Error('Email credentials not configured');
   }
 
@@ -173,12 +173,7 @@ async function sendEmails(userId, emailList) {
     auth: { user: user.senderEmail, pass: user.gmailAppPassword },
   });
 
-  try {
-    await state.transporter.verify();
-  } catch (err) {
-    state.isSending = false;
-    throw new Error('Gmail connection failed: ' + err.message);
-  }
+  await state.transporter.verify();
 
   // Load resume from user-specific dir
   const userUploadsDir = path.join(config.UPLOADS_DIR, userId.toString());
@@ -200,7 +195,6 @@ async function sendEmails(userId, emailList) {
 
   if (skipped > 0) log(`${skipped} emails skipped (already sent)`, userId);
   if (toSend.length === 0) {
-    state.isSending = false;
     return { sent: 0, failed: 0, skipped };
   }
 
@@ -265,11 +259,14 @@ async function sendEmails(userId, emailList) {
     }
   }
 
-  state.isSending = false;
-  state.shouldStop = false;
   broadcast('email:complete', { sent, failed, skipped }, userId);
   log(`Email sending complete! Sent: ${sent}, Failed: ${failed}`, userId);
   return { sent, failed, skipped };
+
+  } finally {
+    state.isSending = false;
+    state.shouldStop = false;
+  }
 }
 
 module.exports = { sendEmails, stopSending, getSendStatus, testConnection, loadSentEmails, generateEmailHTML, generateEmailText };

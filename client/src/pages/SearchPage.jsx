@@ -120,9 +120,13 @@ export default function SearchPage() {
           {searchProgress.scroll && (
             <ProgressBar current={searchProgress.scroll} total={searchProgress.scrollTotal} label="Scrolling..." />
           )}
-          <div className="flex gap-6 text-sm text-gray-600">
-            <span>Emails found: <strong>{searchProgress.totalEmails || 0}</strong></span>
-            <span>Profiles found: <strong>{searchProgress.totalProfiles || 0}</strong></span>
+          <div className="flex flex-wrap gap-4 text-sm">
+            <span className="text-blue-600">Emails: <strong>{searchProgress.totalEmails || 0}</strong></span>
+            <span className="text-green-600">New: <strong>{searchProgress.newEmails || 0}</strong></span>
+            <span className="text-gray-400">Already sent: <strong>{searchProgress.alreadySentEmails || 0}</strong></span>
+            <span className="border-l border-gray-200 pl-4 text-purple-600">Profiles: <strong>{searchProgress.totalProfiles || 0}</strong></span>
+            <span className="text-green-600">New: <strong>{searchProgress.newProfiles || 0}</strong></span>
+            <span className="text-gray-400">Already DMed: <strong>{searchProgress.alreadyDMedProfiles || 0}</strong></span>
           </div>
         </div>
       )}

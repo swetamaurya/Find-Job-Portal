@@ -450,7 +450,6 @@ async function sendSingleDM(page, profileUrl, message, connectionNote, index, to
         if (messageButton) {
           const dmResult = await sendDirectMessage(page, messageButton, message, index, total);
           if (dmResult.success) return dmResult;
-          console.log(`[DM-DEBUG] ${index + 1}/${total} DM failed: ${dmResult.reason} → falling back to connection`);
           // Fallback to connection request if DM fails for any recoverable reason
           const fallbackReasons = ['premium_required', 'compose_box_not_found', 'message_not_typed'];
           if (sendConnectionReq && fallbackReasons.includes(dmResult.reason)) {
@@ -463,7 +462,6 @@ async function sendSingleDM(page, profileUrl, message, connectionNote, index, to
           return dmResult;
         }
       } else {
-        console.log(`[DM-DEBUG] ${index + 1}/${total} No Message button found → trying connection`);
       }
 
       if (sendConnectionReq) {
@@ -490,13 +488,13 @@ async function sendAllDMs(userId, profiles) {
   state.isSending = true;
   state.shouldStop = false;
 
+  try {
   // Use getConfig which includes default dmMessage and connectionNote from user profile
   const cfg = await configService.getConfig(userId);
   let page;
   try {
     page = await browserService.ensurePage(userId);
   } catch (err) {
-    state.isSending = false;
     log(`DM Error: ${err.message}`, userId);
     broadcast('dm:complete', { dmSent: 0, connectSent: 0, failed: 0, error: err.message }, userId);
     throw err;
@@ -507,7 +505,6 @@ async function sendAllDMs(userId, profiles) {
   const toProcess = newProfiles.slice(0, cfg.maxDMsPerSession || 50);
 
   if (toProcess.length === 0) {
-    state.isSending = false;
     log('No new profiles to DM (all already sent)', userId);
     broadcast('dm:complete', { dmSent: 0, connectSent: 0, failed: 0 }, userId);
     return { dmSent: 0, connectSent: 0, failed: 0 };
@@ -571,11 +568,14 @@ async function sendAllDMs(userId, profiles) {
     }
   }
 
-  state.isSending = false;
-  state.shouldStop = false;
   broadcast('dm:complete', { dmSent, connectSent, failed }, userId);
   log(`DMs complete! DMs: ${dmSent}, Connections: ${connectSent}, Failed: ${failed}`, userId);
   return { dmSent, connectSent, failed };
+
+  } finally {
+    state.isSending = false;
+    state.shouldStop = false;
+  }
 }
 
 module.exports = { sendAllDMs, stopDMs, getDMStatus, loadSentDMs, loadSentDMsSet };

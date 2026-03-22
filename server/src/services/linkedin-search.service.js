@@ -462,6 +462,12 @@ async function startSearch(userId) {
   const allJobs = [];
   const queries = cfg.searchQueries || [];
 
+  // Pre-load sent data for real-time new/already-sent tracking
+  const { loadSentEmails } = require('./email-send.service');
+  const { loadSentDMsSet } = require('./dm.service');
+  const sentEmails = await loadSentEmails(userId);
+  const sentDMs = await loadSentDMsSet(userId);
+
   broadcast('search:started', { totalQueries: queries.length }, userId);
   log(`Starting search with ${queries.length} queries...`, userId);
 
@@ -497,12 +503,18 @@ async function startSearch(userId) {
       });
       (result.posts || []).forEach((p) => allJobs.push({ ...p, searchQuery: result.query }));
 
+      const newEmailCount = Array.from(allEmails.values()).filter((e) => !sentEmails.has(e.email.toLowerCase())).length;
+      const alreadySentCount = allEmails.size - newEmailCount;
+      const newProfileCount = allProfiles.filter((p) => !sentDMs.has(p.profileUrl.toLowerCase())).length;
+      const alreadyDMedCount = allProfiles.length - newProfileCount;
+
       broadcast('search:query-complete', {
         index: q, query: queries[q],
         emailsFound: validExtracted.length, profilesFound: (result.profiles || []).length,
-        totalEmails: allEmails.size, totalProfiles: allProfiles.length,
+        totalEmails: allEmails.size, newEmails: newEmailCount, alreadySentEmails: alreadySentCount,
+        totalProfiles: allProfiles.length, newProfiles: newProfileCount, alreadyDMedProfiles: alreadyDMedCount,
       }, userId);
-      log(`[${q + 1}/${queries.length}] "${queries[q]}" → ${validExtracted.length} emails, ${(result.profiles || []).length} profiles (total: ${allEmails.size} emails, ${allProfiles.length} profiles)`, userId);
+      log(`[${q + 1}/${queries.length}] "${queries[q]}" → ${validExtracted.length} emails, ${(result.profiles || []).length} profiles (total: ${allEmails.size} emails [${newEmailCount} new], ${allProfiles.length} profiles [${newProfileCount} new])`, userId);
     } catch (err) {
       log(`[${q + 1}/${queries.length}] "${queries[q]}" → FAILED: ${err.message}`, userId);
       // Try to recover with a fresh page
@@ -528,11 +540,6 @@ async function startSearch(userId) {
   };
 
   await ExtractedResult.findOneAndReplace({ userId }, resultData, { upsert: true });
-
-  const { loadSentEmails } = require('./email-send.service');
-  const { loadSentDMsSet } = require('./dm.service');
-  const sentEmails = await loadSentEmails(userId);
-  const sentDMs = await loadSentDMsSet(userId);
 
   const newEmails = emailArray.filter((e) => !sentEmails.has(e.email.toLowerCase())).length;
   const alreadySentEmails = emailArray.length - newEmails;
