@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Mail, MessageSquare, Monitor, Play, Send, Square } from 'lucide-react';
+import { Mail, MessageSquare, Monitor, Play, Send, Square, UserPlus } from 'lucide-react';
 import api from '../lib/api';
 import StatCard from '../components/common/StatCard';
 import StatusBadge from '../components/common/StatusBadge';
@@ -104,11 +104,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <StatCard icon={Mail} label="Total Emails Found" value={stats.totalEmails || 0} color="blue" />
         <StatCard icon={Mail} label="New (Unsent)" value={Math.max(0, (stats.totalEmails || 0) - (stats.sentEmailsCount || 0))} color="orange" />
-        <StatCard icon={Send} label="Emails Sent (All Time)" value={stats.sentEmailsCount || 0} color="green" />
-        <StatCard icon={MessageSquare} label="DMs Sent (All Time)" value={stats.sentDMsCount || 0} color="purple" />
+        <StatCard icon={Send} label="Emails Sent" value={stats.sentEmailsCount || 0} color="green" />
+        <StatCard icon={MessageSquare} label="DMs Sent" value={stats.dmSentCount || 0} color="purple" />
+        <StatCard icon={UserPlus} label="Connections Sent" value={stats.connectSentCount || 0} color="blue" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

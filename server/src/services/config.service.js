@@ -70,7 +70,8 @@ async function getStats(userId) {
   let totalEmails = 0;
   let totalProfiles = 0;
   let sentEmailsCount = 0;
-  let sentDMsCount = 0;
+  let dmSentCount = 0;
+  let connectSentCount = 0;
 
   try {
     const data = await ExtractedResult.findOne({ userId }).lean();
@@ -85,10 +86,11 @@ async function getStats(userId) {
   } catch {}
 
   try {
-    sentDMsCount = await SentDM.countDocuments({ userId, status: { $in: ['dm_sent', 'connected'] } });
+    dmSentCount = await SentDM.countDocuments({ userId, status: 'dm_sent' });
+    connectSentCount = await SentDM.countDocuments({ userId, status: 'connected' });
   } catch {}
 
-  return { totalEmails, totalProfiles, sentEmailsCount, sentDMsCount };
+  return { totalEmails, totalProfiles, sentEmailsCount, dmSentCount, connectSentCount };
 }
 
 module.exports = { getConfig, updateConfig, updateCredentials, updateProfile, getStats };
