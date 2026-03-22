@@ -11,6 +11,7 @@ const dmsRoutes = require('./routes/dms.routes');
 
 const SentEmail = require('./models/SentEmail');
 const SentDM = require('./models/SentDM');
+const User = require('./models/User');
 
 const app = express();
 
@@ -27,11 +28,26 @@ app.use('/api', auth, searchRoutes);
 app.use('/api/emails', auth, emailsRoutes);
 app.use('/api/dms', auth, dmsRoutes);
 
+// Users list (protected)
+app.get('/api/users', auth, async (req, res) => {
+  try {
+    const users = await User.find({}, { password: 0, gmailAppPassword: 0 }).sort({ createdAt: -1 }).lean();
+    const usersWithStats = await Promise.all(users.map(async (u) => {
+      const emailsSent = await SentEmail.countDocuments({ userId: u._id });
+      const dmsSent = await SentDM.countDocuments({ userId: u._id });
+      return { ...u, emailsSent, dmsSent };
+    }));
+    res.json({ users: usersWithStats, total: usersWithStats.length });
+  } catch {
+    res.json({ users: [], total: 0 });
+  }
+});
+
 // History routes (protected)
 app.get('/api/history/emails', auth, async (req, res) => {
   try {
-    const docs = await SentEmail.find({ userId: req.userId }).lean();
-    const emails = docs.map((d) => d.email);
+    const docs = await SentEmail.find({ userId: req.userId }).sort({ sentAt: -1 }).lean();
+    const emails = docs.map((d) => ({ email: d.email, sentAt: d.sentAt }));
     res.json({ emails, total: emails.length });
   } catch {
     res.json({ emails: [], total: 0 });
@@ -40,11 +56,13 @@ app.get('/api/history/emails', auth, async (req, res) => {
 
 app.get('/api/history/dms', auth, async (req, res) => {
   try {
-    const docs = await SentDM.find({ userId: req.userId }).lean();
-    const dms = docs.map((d) => d.profileUrl);
-    res.json({ dms, total: dms.length });
+    const docs = await SentDM.find({ userId: req.userId }).sort({ sentAt: -1 }).lean();
+    const dms = docs.map((d) => ({ profileUrl: d.profileUrl, status: d.status, sentAt: d.sentAt }));
+    const dmCount = dms.filter((d) => d.status === 'dm_sent').length;
+    const connCount = dms.filter((d) => d.status === 'connected').length;
+    res.json({ dms, total: dms.length, dmCount, connCount });
   } catch {
-    res.json({ dms: [], total: 0 });
+    res.json({ dms: [], total: 0, dmCount: 0, connCount: 0 });
   }
 });
 

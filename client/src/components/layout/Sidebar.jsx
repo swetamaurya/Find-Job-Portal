@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Search, Mail, MessageSquare, History, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Search, Mail, MessageSquare, History, Settings, Users, LogOut } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuthStore } from '../../store/authStore';
 import { useStore } from '../../store';
@@ -12,6 +12,7 @@ const links = [
   { to: '/emails', icon: Mail, label: 'Emails' },
   { to: '/dms', icon: MessageSquare, label: 'DMs' },
   { to: '/history', icon: History, label: 'History' },
+  { to: '/users', icon: Users, label: 'Users' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
