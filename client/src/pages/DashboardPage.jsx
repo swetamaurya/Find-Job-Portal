@@ -12,24 +12,45 @@ export default function DashboardPage() {
   const browserStatus = useStore((s) => s.browserStatus);
   const searchProgress = useStore((s) => s.searchProgress);
   const emailProgress = useStore((s) => s.emailProgress);
+  const dmProgress = useStore((s) => s.dmProgress);
   const addToast = useStore((s) => s.addToast);
 
   const fetchStats = () => {
     api.get('/dashboard/stats').then((r) => {
       setStats(r.data);
-      if (r.data.browserRunning) {
-        useStore.getState().setBrowserStatus(
-          r.data.browserRunning ? 'running' : 'stopped'
-        );
+      // Sync all statuses from server (fixes stale UI)
+      const store = useStore.getState();
+      store.setBrowserStatus(r.data.browserRunning ? 'running' : 'stopped');
+      if (!r.data.searchRunning && store.searchProgress.running) {
+        store.setSearchProgress({ running: false });
+      }
+      if (!r.data.emailSending && store.emailProgress.running) {
+        store.setEmailProgress({ running: false });
+      }
+      if (!r.data.dmSending && store.dmProgress.running) {
+        store.setDMProgress({ running: false });
       }
     }).catch(() => {});
   };
 
   useEffect(() => {
     fetchStats();
-    const timer = setInterval(fetchStats, 5000);
+    const timer = setInterval(fetchStats, 10000);
     return () => clearInterval(timer);
   }, []);
+
+  // Refresh stats immediately when search/email/DM completes
+  useEffect(() => {
+    if (!searchProgress.running && searchProgress.completed) fetchStats();
+  }, [searchProgress.running]);
+
+  useEffect(() => {
+    if (!emailProgress.running && emailProgress.sent > 0) fetchStats();
+  }, [emailProgress.running]);
+
+  useEffect(() => {
+    if (!dmProgress.running && (dmProgress.dmSent > 0 || dmProgress.connectSent > 0)) fetchStats();
+  }, [dmProgress.running]);
 
   const launchBrowser = async () => {
     setLoading(true);

@@ -13,6 +13,8 @@ export default function DMsPage() {
   const [profiles, setProfiles] = useState([]);
   const [config, setConfig] = useState({});
   const dmProgress = useStore((s) => s.dmProgress);
+  const setDMProgress = useStore((s) => s.setDMProgress);
+  const searchProgress = useStore((s) => s.searchProgress);
   const browserStatus = useStore((s) => s.browserStatus);
   const addToast = useStore((s) => s.addToast);
 
@@ -23,11 +25,20 @@ export default function DMsPage() {
   useEffect(() => {
     fetchProfiles();
     api.get('/config').then((r) => setConfig(r.data)).catch(() => {});
+    // Clear stale DM progress from previous session
+    if (!dmProgress.running) {
+      setDMProgress({ running: false });
+    }
   }, []);
 
   useEffect(() => {
     if (!dmProgress.running && (dmProgress.dmSent > 0 || dmProgress.connectSent > 0 || dmProgress.failed > 0)) fetchProfiles();
   }, [dmProgress.running]);
+
+  // Refresh when search completes (new profiles found)
+  useEffect(() => {
+    if (!searchProgress.running && searchProgress.completed) fetchProfiles();
+  }, [searchProgress.running]);
 
   const startDMs = async () => {
     const newProfiles = profiles.filter((p) => p.dmStatus === 'new');

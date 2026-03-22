@@ -407,19 +407,11 @@ async function searchOneQuery(tabPage, query, cfg, state, userId) {
   let extracted;
   try {
     extracted = await extractFromPage(tabPage, cfg.skipKeywords || []);
-  } catch (err) {
-    log(`[DEBUG] extractFromPage error: ${err.message}`, userId);
+  } catch {
     extracted = { emails: [], posts: [], profiles: [] };
   }
 
-  // Debug log filter stats
   if (extracted._debug) {
-    const d = extracted._debug;
-    const skipKwStr = (cfg.skipKeywords || []).length > 0 ? (cfg.skipKeywords || []).join(', ') : 'none';
-    log(`[DEBUG] "${query}" | skipKw: [${skipKwStr}]`, userId);
-    log(`[DEBUG] Chunks: ${d.totalChunks} total | ${d.tooShort} short | ${d.skippedByKeyword} skipKw | ${d.jobSeekerSkip} seeker | ${d.expSkip} exp | ${d.notJobRelated} notJob | ${d.domainFiltered} domainFilter | ${d.passed} passed`, userId);
-    log(`[DEBUG] Posts: ${d.totalPosts} total | ${d.postTooShort} short | ${d.postSkipKw} skipKw | ${d.postJobSeeker} seeker | ${d.postExpSkip} exp | ${d.postNotJob} notJob | ${d.postNoProfile} noProfile | ${d.postNotRelevant} notRelevant | ${d.postPassed} passed`, userId);
-    log(`[DEBUG] Result: ${extracted.emails.length} emails, ${extracted.profiles.length} profiles`, userId);
     delete extracted._debug;
   }
 
@@ -442,6 +434,7 @@ async function startSearch(userId) {
   state.isSearching = true;
   state.shouldStop = false;
 
+  try {
   const cfg = await loadConfig(userId);
   const page = await browserService.ensurePage(userId);
 
@@ -457,7 +450,6 @@ async function startSearch(userId) {
       await sleep(5000);
       const currentUrl = page.url();
       if (currentUrl.includes('/login') || currentUrl.includes('/authwall') || currentUrl.includes('about:blank')) {
-        state.isSearching = false;
         log('LinkedIn login required! Please log in via the browser window and try again.', userId);
         broadcast('auth:login-required', {}, userId);
         broadcast('search:complete', { totalEmails: 0, totalProfiles: 0, totalPosts: 0, error: 'Login required' }, userId);
@@ -478,8 +470,17 @@ async function startSearch(userId) {
     broadcast('search:query-start', { index: q, total: queries.length, query: queries[q] }, userId);
     log(`[${q + 1}/${queries.length}] Searching: "${queries[q]}"`, userId);
 
+    // Get fresh page before each query (fixes detached frame errors)
+    let currentPage;
     try {
-      const result = await searchOneQuery(page, queries[q], cfg, state, userId);
+      currentPage = await browserService.ensurePage(userId);
+    } catch (err) {
+      log(`[${q + 1}/${queries.length}] Browser disconnected, stopping search.`, userId);
+      break;
+    }
+
+    try {
+      const result = await searchOneQuery(currentPage, queries[q], cfg, state, userId);
 
       const validExtracted = result.emails.filter((e) => isValidEmail(e.email));
       validExtracted.forEach((e) => {
@@ -504,17 +505,16 @@ async function startSearch(userId) {
       log(`[${q + 1}/${queries.length}] "${queries[q]}" → ${validExtracted.length} emails, ${(result.profiles || []).length} profiles (total: ${allEmails.size} emails, ${allProfiles.length} profiles)`, userId);
     } catch (err) {
       log(`[${q + 1}/${queries.length}] "${queries[q]}" → FAILED: ${err.message}`, userId);
+      // Try to recover with a fresh page
       try {
-        await page.goto('https://www.linkedin.com/feed/', { waitUntil: 'domcontentloaded', timeout: 15000 });
+        currentPage = await browserService.ensurePage(userId);
+        await currentPage.goto('https://www.linkedin.com/feed/', { waitUntil: 'domcontentloaded', timeout: 15000 });
         await randomSleep(2000, 4000);
       } catch {}
     }
 
     if (q < queries.length - 1 && !state.shouldStop) await randomSleep(2000, 3000);
   }
-
-  state.isSearching = false;
-  state.shouldStop = false;
 
   const emailArray = Array.from(allEmails.values());
   const resultData = {
@@ -547,6 +547,11 @@ async function startSearch(userId) {
   log(`Search complete! Emails: ${emailArray.length} total (${newEmails} new, ${alreadySentEmails} already sent) | Profiles: ${allProfiles.length} total (${newProfiles} new, ${alreadyDMedProfiles} already DMed) | Posts: ${allJobs.length}`, userId);
 
   return resultData;
+
+  } finally {
+    state.isSearching = false;
+    state.shouldStop = false;
+  }
 }
 
 module.exports = { startSearch, stopSearch, getSearchStatus };

@@ -14,6 +14,8 @@ export default function EmailsPage() {
   const [filter, setFilter] = useState('all');
   const [searchText, setSearchText] = useState('');
   const emailProgress = useStore((s) => s.emailProgress);
+  const setEmailProgress = useStore((s) => s.setEmailProgress);
+  const searchProgress = useStore((s) => s.searchProgress);
   const addToast = useStore((s) => s.addToast);
 
   const fetchEmails = () => {
@@ -22,12 +24,21 @@ export default function EmailsPage() {
 
   useEffect(() => {
     fetchEmails();
+    // Clear stale email progress from previous session
+    if (!emailProgress.running) {
+      setEmailProgress({ running: false });
+    }
   }, []);
 
   // Refresh when email sending completes
   useEffect(() => {
     if (!emailProgress.running && emailProgress.sent > 0) fetchEmails();
   }, [emailProgress.running]);
+
+  // Refresh when search completes (new emails found)
+  useEffect(() => {
+    if (!searchProgress.running && searchProgress.completed) fetchEmails();
+  }, [searchProgress.running]);
 
   const filteredEmails = emails.filter((e) => {
     if (filter !== 'all' && e.status !== filter) return false;

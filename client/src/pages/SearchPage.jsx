@@ -21,11 +21,16 @@ export default function SearchPage() {
   const [newQuery, setNewQuery] = useState('');
   const [newSkip, setNewSkip] = useState('');
   const searchProgress = useStore((s) => s.searchProgress);
+  const setSearchProgress = useStore((s) => s.setSearchProgress);
   const browserStatus = useStore((s) => s.browserStatus);
   const addToast = useStore((s) => s.addToast);
 
   useEffect(() => {
     api.get('/config').then((r) => setConfig(r.data)).catch(() => {});
+    // Clear stale search summary from previous session
+    if (!searchProgress.running) {
+      setSearchProgress({ running: false });
+    }
   }, []);
 
   const saveConfig = (updates) => {

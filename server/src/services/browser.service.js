@@ -61,6 +61,13 @@ async function launch(userId) {
     try { await dialog.accept(); } catch {}
   });
 
+  // Detect browser crash/close automatically
+  browser.on('disconnected', () => {
+    userBrowsers.delete(key);
+    log('Browser disconnected', userId);
+    broadcast('browser:closed', {}, userId);
+  });
+
   userBrowsers.set(key, { browser, page });
 
   log('Browser launched!', userId);

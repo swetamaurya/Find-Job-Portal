@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Mail, MessageSquare, UserPlus } from 'lucide-react';
 import api from '../lib/api';
+import { useStore } from '../store';
 
 function formatDate(dateStr) {
   if (!dateStr) return '';
@@ -20,15 +21,31 @@ export default function HistoryPage() {
   const [sentDMs, setSentDMs] = useState([]);
   const [dmCount, setDmCount] = useState(0);
   const [connCount, setConnCount] = useState(0);
+  const emailProgress = useStore((s) => s.emailProgress);
+  const dmProgress = useStore((s) => s.dmProgress);
 
-  useEffect(() => {
+  const fetchHistory = () => {
     api.get('/history/emails').then((r) => setSentEmails(r.data.emails || [])).catch(() => {});
     api.get('/history/dms').then((r) => {
       setSentDMs(r.data.dms || []);
       setDmCount(r.data.dmCount || 0);
       setConnCount(r.data.connCount || 0);
     }).catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchHistory();
   }, []);
+
+  // Auto-refresh when email sending completes
+  useEffect(() => {
+    if (!emailProgress.running && emailProgress.sent > 0) fetchHistory();
+  }, [emailProgress.running]);
+
+  // Auto-refresh when DM sending completes
+  useEffect(() => {
+    if (!dmProgress.running && (dmProgress.dmSent > 0 || dmProgress.connectSent > 0)) fetchHistory();
+  }, [dmProgress.running]);
 
   return (
     <div className="space-y-6">

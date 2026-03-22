@@ -25,12 +25,27 @@ function init(server) {
       }
     } catch {}
 
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; });
+
     // Send recent logs to new client
     if (ws.userId) {
       const logs = getUserLogs(ws.userId);
       ws.send(JSON.stringify({ type: 'init', logs: logs.slice(-50) }));
     }
   });
+
+  // Ping all clients every 30s to keep connections alive
+  const heartbeat = setInterval(() => {
+    if (!wss) return;
+    wss.clients.forEach((ws) => {
+      if (!ws.isAlive) return ws.terminate();
+      ws.isAlive = false;
+      ws.ping();
+    });
+  }, 30000);
+
+  wss.on('close', () => clearInterval(heartbeat));
 }
 
 function broadcast(type, data, userId) {
