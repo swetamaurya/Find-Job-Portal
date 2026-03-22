@@ -14,7 +14,7 @@ function generateDefaultDM(user) {
   msg += `I'm ${name}, a ${role}`;
   if (experience) msg += ` with ${experience}`;
   msg += `.\n`;
-  msg += `Would love to learn more about the position. Happy to share my resume if it's a fit!`;
+  msg += `Let me know if the role is still open — happy to share my resume and discuss further.`;
   return msg;
 }
 
@@ -23,7 +23,7 @@ function generateDefaultConnectionNote(user) {
   const name = user.senderName || user.name || '';
   const role = p.role ? p.role.split('|')[0].trim() : 'Developer';
   // LinkedIn connection note max 300 chars
-  let note = `Hi, I'm ${name}, a ${role}. Came across your post and would love to connect regarding the role. Happy to chat anytime!`;
+  let note = `Hi, I'm ${name}, a ${role}. Came across your post about the role. Let me know if it's still open — happy to discuss anytime!`;
   return note.substring(0, 300);
 }
 
@@ -39,7 +39,7 @@ async function getConfig(userId) {
     senderEmail: user?.senderEmail || '',
     senderName: user?.senderName || '',
     hasPassword: !!user?.gmailAppPassword,
-    passwordMasked: user?.gmailAppPassword ? '****' + user.gmailAppPassword.slice(-4) : '',
+    gmailAppPassword: user?.gmailAppPassword || '',
     profile: user?.profile || {},
     resumeFilename: user?.resumeFilename || '',
   };

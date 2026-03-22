@@ -2,9 +2,10 @@ node_modules/
 .env
 chrome-temp-profile/
 .claude/
-server/uploads/*.pdf
-server/uploads/*.docx
 server/uploads/
+uploads/
 .DS_Store
 dist/
 *.log
+*.pdf
+package-lock.json

@@ -1,7 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Save, TestTube, Upload, Trash2, Eye, EyeOff, User, FileText } from 'lucide-react';
+import { Save, TestTube, Upload, Trash2, Eye, EyeOff, User, FileText, ChevronDown, ChevronRight } from 'lucide-react';
 import api from '../lib/api';
 import { useStore } from '../store';
+
+function Section({ title, icon, open, onToggle, children, borderColor = 'border-gray-100' }) {
+  return (
+    <div className={`bg-white rounded-xl shadow-sm border ${borderColor}`}>
+      <button onClick={onToggle} className="w-full flex items-center justify-between p-4 text-left">
+        <h3 className="font-semibold text-gray-800 flex items-center gap-2">{icon}{title}</h3>
+        {open ? <ChevronDown size={18} className="text-gray-400" /> : <ChevronRight size={18} className="text-gray-400" />}
+      </button>
+      {open && <div className="px-6 pb-5 space-y-4 border-t border-gray-50 pt-4">{children}</div>}
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const [config, setConfig] = useState(null);
@@ -15,12 +27,15 @@ export default function SettingsPage() {
   const [showPreview, setShowPreview] = useState(false);
   const [showAppPassword, setShowAppPassword] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [openSection, setOpenSection] = useState('credentials');
   const addToast = useStore((s) => s.addToast);
+
+  const toggle = (name) => setOpenSection((prev) => prev === name ? null : name);
 
   useEffect(() => {
     api.get('/config').then((r) => {
       setConfig(r.data);
-      setCredentials({ senderEmail: r.data.senderEmail || '', senderName: r.data.senderName || '', appPassword: '' });
+      setCredentials({ senderEmail: r.data.senderEmail || '', senderName: r.data.senderName || '', appPassword: r.data.gmailAppPassword || '' });
       if (r.data.profile) {
         setProfile({
           role: r.data.profile.role || '',
@@ -41,6 +56,9 @@ export default function SettingsPage() {
       const payload = { senderEmail: credentials.senderEmail, senderName: credentials.senderName };
       if (credentials.appPassword) payload.appPassword = credentials.appPassword;
       await api.post('/config/credentials', payload);
+      const r = await api.get('/config');
+      setConfig(r.data);
+      setCredentials((p) => ({ ...p, senderEmail: r.data.senderEmail || p.senderEmail, senderName: r.data.senderName || p.senderName }));
       addToast('Credentials saved successfully');
     } catch (err) {
       addToast(err.response?.data?.error || 'Failed to save credentials', 'error');
@@ -107,50 +125,28 @@ export default function SettingsPage() {
   if (!config) return <div className="text-gray-500">Loading...</div>;
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-3 max-w-3xl">
       <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
 
-      {/* Email Credentials */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-        <h3 className="font-semibold text-gray-800">Email Credentials</h3>
+      <Section title="Email Credentials" open={openSection === 'credentials'} onToggle={() => toggle('credentials')}>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Sender Email</label>
-            <input
-              type="email"
-              value={credentials.senderEmail}
-              onChange={(e) => setCredentials((p) => ({ ...p, senderEmail: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <input type="email" value={credentials.senderEmail} onChange={(e) => setCredentials((p) => ({ ...p, senderEmail: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
           <div>
             <label className="block text-sm text-gray-600 mb-1">Sender Name</label>
-            <input
-              type="text"
-              value={credentials.senderName}
-              onChange={(e) => setCredentials((p) => ({ ...p, senderName: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <input type="text" value={credentials.senderName} onChange={(e) => setCredentials((p) => ({ ...p, senderName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
         </div>
         <div>
           <label className="block text-sm text-gray-600 mb-1">
-            Gmail App Password {config.hasPassword && <span className="text-gray-400">(current: {config.passwordMasked})</span>}
+            Gmail App Password
+            {config.hasPassword && <span className="ml-2 text-green-600 font-medium text-xs bg-green-50 px-2 py-0.5 rounded-full">Saved</span>}
           </label>
           <div className="relative">
-            <input
-              type={showAppPassword ? 'text' : 'password'}
-              value={credentials.appPassword}
-              onChange={(e) => setCredentials((p) => ({ ...p, appPassword: e.target.value }))}
-              placeholder="Leave blank to keep current"
-              autoComplete="new-password"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm"
-            />
-            <button
-              type="button"
-              onClick={() => setShowAppPassword((v) => !v)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
+            <input type={showAppPassword ? 'text' : 'password'} value={credentials.appPassword} onChange={(e) => setCredentials((p) => ({ ...p, appPassword: e.target.value }))} placeholder="Enter Gmail App Password" autoComplete="new-password" className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm" />
+            <button type="button" onClick={() => setShowAppPassword((v) => !v)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
               {showAppPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
@@ -163,292 +159,146 @@ export default function SettingsPage() {
             <TestTube size={16} /> {testing ? 'Testing...' : 'Test Connection'}
           </button>
         </div>
-        {testResult && (
-          <p className={`text-sm ${testResult.success ? 'text-green-600' : 'text-red-600'}`}>{testResult.message}</p>
-        )}
-      </div>
+        {testResult && <p className={`text-sm ${testResult.success ? 'text-green-600' : 'text-red-600'}`}>{testResult.message}</p>}
+      </Section>
 
-      {/* Profile Info */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-        <h3 className="font-semibold text-gray-800 flex items-center gap-2"><User size={18} /> Profile Info</h3>
+      <Section title="Profile Info" icon={<User size={18} />} open={openSection === 'profile'} onToggle={() => toggle('profile')}>
         <p className="text-xs text-gray-500">Used to auto-generate email templates in Structured mode.</p>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Role / Title</label>
-            <input
-              type="text"
-              value={profile.role}
-              onChange={(e) => setProfile((p) => ({ ...p, role: e.target.value }))}
-              placeholder="e.g. Senior Backend Developer"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <input type="text" value={profile.role} onChange={(e) => setProfile((p) => ({ ...p, role: e.target.value }))} placeholder="e.g. Senior Backend Developer" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
           <div>
             <label className="block text-sm text-gray-600 mb-1">Experience</label>
-            <input
-              type="text"
-              value={profile.experience}
-              onChange={(e) => setProfile((p) => ({ ...p, experience: e.target.value }))}
-              placeholder="e.g. 3.5+ years at Acme Corp"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <input type="text" value={profile.experience} onChange={(e) => setProfile((p) => ({ ...p, experience: e.target.value }))} placeholder="e.g. 3.5+ years at Acme Corp" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
         </div>
         <div>
           <label className="block text-sm text-gray-600 mb-1">Skills</label>
-          <input
-            type="text"
-            value={profile.skills}
-            onChange={(e) => setProfile((p) => ({ ...p, skills: e.target.value }))}
-            placeholder="e.g. Node.js, Express.js, MongoDB, AWS"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-          />
+          <input type="text" value={profile.skills} onChange={(e) => setProfile((p) => ({ ...p, skills: e.target.value }))} placeholder="e.g. Node.js, Express.js, MongoDB, AWS" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Phone</label>
-            <input
-              type="text"
-              value={profile.phone}
-              onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <input type="text" value={profile.phone} onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
           <div>
             <label className="block text-sm text-gray-600 mb-1">LinkedIn URL</label>
-            <input
-              type="text"
-              value={profile.linkedinUrl}
-              onChange={(e) => setProfile((p) => ({ ...p, linkedinUrl: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <input type="text" value={profile.linkedinUrl} onChange={(e) => setProfile((p) => ({ ...p, linkedinUrl: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">GitHub URL</label>
-            <input
-              type="text"
-              value={profile.githubUrl}
-              onChange={(e) => setProfile((p) => ({ ...p, githubUrl: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <input type="text" value={profile.githubUrl} onChange={(e) => setProfile((p) => ({ ...p, githubUrl: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
           <div>
             <label className="block text-sm text-gray-600 mb-1">Portfolio URL</label>
-            <input
-              type="text"
-              value={profile.portfolioUrl}
-              onChange={(e) => setProfile((p) => ({ ...p, portfolioUrl: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <input type="text" value={profile.portfolioUrl} onChange={(e) => setProfile((p) => ({ ...p, portfolioUrl: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
         </div>
         <button onClick={saveProfile} disabled={savingProfile} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-sm font-medium">
           <Save size={16} /> {savingProfile ? 'Saving...' : 'Save Profile'}
         </button>
-      </div>
+      </Section>
 
-      {/* Email Template */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-        <h3 className="font-semibold text-gray-800">Email Template</h3>
+      <Section title="Email Template" open={openSection === 'template'} onToggle={() => toggle('template')}>
         <div className="flex gap-4">
           <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-            <input
-              type="radio"
-              name="templateMode"
-              checked={(config.emailTemplateMode || 'structured') === 'structured'}
-              onChange={() => updateConfig({ emailTemplateMode: 'structured' })}
-              className="text-blue-600"
-            />
+            <input type="radio" name="templateMode" checked={(config.emailTemplateMode || 'structured') === 'structured'} onChange={() => updateConfig({ emailTemplateMode: 'structured' })} className="text-blue-600" />
             Structured (auto from profile)
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-            <input
-              type="radio"
-              name="templateMode"
-              checked={config.emailTemplateMode === 'custom'}
-              onChange={() => updateConfig({ emailTemplateMode: 'custom' })}
-              className="text-blue-600"
-            />
+            <input type="radio" name="templateMode" checked={config.emailTemplateMode === 'custom'} onChange={() => updateConfig({ emailTemplateMode: 'custom' })} className="text-blue-600" />
             Custom
           </label>
         </div>
-
         {config.emailTemplateMode === 'custom' && (
           <div className="space-y-4">
             <div>
               <label className="block text-sm text-gray-600 mb-1">HTML Template</label>
-              <textarea
-                value={config.emailTemplateHtml || ''}
-                onChange={(e) => updateConfig({ emailTemplateHtml: e.target.value })}
-                rows={8}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono"
-                placeholder="<div>Your HTML email template...</div>"
-              />
+              <textarea value={config.emailTemplateHtml || ''} onChange={(e) => updateConfig({ emailTemplateHtml: e.target.value })} rows={8} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" placeholder="<div>Your HTML email template...</div>" />
             </div>
             <div>
               <label className="block text-sm text-gray-600 mb-1">Plain Text Template</label>
-              <textarea
-                value={config.emailTemplateText || ''}
-                onChange={(e) => updateConfig({ emailTemplateText: e.target.value })}
-                rows={6}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono"
-                placeholder="Your plain text email template..."
-              />
+              <textarea value={config.emailTemplateText || ''} onChange={(e) => updateConfig({ emailTemplateText: e.target.value })} rows={6} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" placeholder="Your plain text email template..." />
             </div>
           </div>
         )}
-
         <button onClick={showPreview ? () => setShowPreview(false) : loadPreview} className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-lg px-4 py-2 text-sm font-medium text-gray-700">
           {showPreview ? <><EyeOff size={16} /> Hide Preview</> : <><Eye size={16} /> Preview Email</>}
         </button>
-
         {showPreview && emailPreview && (
           <div className="space-y-3">
             <div>
               <p className="text-xs font-medium text-gray-500 mb-1">HTML Preview:</p>
-              <div
-                className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-sm"
-                dangerouslySetInnerHTML={{ __html: emailPreview.html }}
-              />
+              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-sm" dangerouslySetInnerHTML={{ __html: emailPreview.html }} />
             </div>
             <div>
               <p className="text-xs font-medium text-gray-500 mb-1">Plain Text Preview:</p>
-              <pre className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-sm whitespace-pre-wrap font-sans">
-                {emailPreview.text}
-              </pre>
+              <pre className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-sm whitespace-pre-wrap font-sans">{emailPreview.text}</pre>
             </div>
           </div>
         )}
-      </div>
+      </Section>
 
-      {/* Email Settings */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-        <h3 className="font-semibold text-gray-800">Email Settings</h3>
+      <Section title="Email & DM Settings" open={openSection === 'emaildm'} onToggle={() => toggle('emaildm')}>
         <div>
           <label className="block text-sm text-gray-600 mb-1">Email Subject</label>
-          <input
-            type="text"
-            value={config.emailSubject || ''}
-            onChange={(e) => updateConfig({ emailSubject: e.target.value })}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-          />
+          <input type="text" value={config.emailSubject || ''} onChange={(e) => updateConfig({ emailSubject: e.target.value })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Delay between batches (ms)</label>
-            <input
-              type="number"
-              value={config.emailDelay || 5000}
-              onChange={(e) => updateConfig({ emailDelay: parseInt(e.target.value) })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
-            <p className="text-xs text-gray-400 mt-1">Wait time after each batch. Too low may get Gmail blocked</p>
+            <input type="number" value={config.emailDelay || 5000} onChange={(e) => updateConfig({ emailDelay: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
           <div>
             <label className="block text-sm text-gray-600 mb-1">Batch size</label>
-            <input
-              type="number"
-              value={config.emailBatchSize || 2}
-              onChange={(e) => updateConfig({ emailBatchSize: parseInt(e.target.value) })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
-            <p className="text-xs text-gray-400 mt-1">Emails sent at once before waiting for delay</p>
+            <input type="number" value={config.emailBatchSize || 2} onChange={(e) => updateConfig({ emailBatchSize: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
         </div>
-      </div>
-
-      {/* DM Settings */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-        <h3 className="font-semibold text-gray-800">DM Settings</h3>
-        <div>
+        <div className="border-t border-gray-100 pt-4 space-y-3">
           <label className="flex items-center gap-2 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={config.sendLinkedInDMs !== false}
-              onChange={(e) => updateConfig({ sendLinkedInDMs: e.target.checked })}
-              className="rounded"
-            />
+            <input type="checkbox" checked={config.sendLinkedInDMs !== false} onChange={(e) => updateConfig({ sendLinkedInDMs: e.target.checked })} className="rounded" />
             Enable LinkedIn DMs
           </label>
-          <p className="text-xs text-gray-400 mt-1 ml-6">Send direct messages to profiles found during search</p>
-        </div>
-        <div>
           <label className="flex items-center gap-2 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={config.sendConnectionRequest !== false}
-              onChange={(e) => updateConfig({ sendConnectionRequest: e.target.checked })}
-              className="rounded"
-            />
+            <input type="checkbox" checked={config.sendConnectionRequest !== false} onChange={(e) => updateConfig({ sendConnectionRequest: e.target.checked })} className="rounded" />
             Send connection requests (fallback)
           </label>
-          <p className="text-xs text-gray-400 mt-1 ml-6">If DM fails, sends a connection request with note instead</p>
         </div>
-      </div>
+      </Section>
 
-      {/* Resume */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-        <h3 className="font-semibold text-gray-800">Resume</h3>
-        {config.resumeFilename && (
-          <p className="text-sm text-gray-600">Current: <span className="font-medium">{config.resumeFilename}</span></p>
-        )}
+      <Section title="Resume" open={openSection === 'resume'} onToggle={() => toggle('resume')}>
+        {config.resumeFilename && <p className="text-sm text-gray-600">Current: <span className="font-medium">{config.resumeFilename}</span></p>}
         <div className="flex gap-3">
           <label className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-lg px-4 py-2 text-sm cursor-pointer w-fit">
             <Upload size={16} /> Upload Resume (PDF)
             <input type="file" accept=".pdf" onChange={uploadResume} className="hidden" />
           </label>
           {config.resumeFilename && (
-            <button
-              onClick={async () => {
-                try {
-                  const r = await api.get('/config/resume', { responseType: 'blob' });
-                  const url = URL.createObjectURL(r.data);
-                  window.open(url, '_blank');
-                } catch {
-                  addToast('Failed to load resume', 'error');
-                }
-              }}
-              className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-2 text-sm font-medium"
-            >
-              <FileText size={16} /> Preview Resume
+            <button onClick={async () => { try { const r = await api.get('/config/resume', { responseType: 'blob' }); window.open(URL.createObjectURL(r.data), '_blank'); } catch { addToast('Failed to load resume', 'error'); } }} className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-2 text-sm font-medium">
+              <FileText size={16} /> Preview
             </button>
           )}
         </div>
-      </div>
+      </Section>
 
-      {/* Danger Zone */}
-      <div className="bg-white rounded-xl shadow-sm border border-red-200 p-6 space-y-4">
-        <h3 className="font-semibold text-red-600">Danger Zone</h3>
+      <Section title="Danger Zone" borderColor="border-red-200" open={openSection === 'danger'} onToggle={() => toggle('danger')}>
         <p className="text-sm text-gray-500">These actions cannot be undone.</p>
         {!confirmClear ? (
-          <button
-            onClick={() => setConfirmClear(true)}
-            className="flex items-center gap-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg px-4 py-2 text-sm font-medium"
-          >
+          <button onClick={() => setConfirmClear(true)} className="flex items-center gap-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg px-4 py-2 text-sm font-medium">
             <Trash2 size={16} /> Clear History
           </button>
         ) : (
           <div className="flex items-center gap-3 bg-red-50 rounded-lg px-4 py-3">
             <p className="text-sm text-red-700">Are you sure? This will clear all sent email history.</p>
-            <button
-              onClick={() => {
-                api.put('/config', {}).then(() => { addToast('History cleared'); setConfirmClear(false); window.location.reload(); }).catch(() => addToast('Failed to clear history', 'error'));
-              }}
-              className="bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-1.5 text-sm font-medium whitespace-nowrap"
-            >
-              Yes, Clear
-            </button>
-            <button
-              onClick={() => setConfirmClear(false)}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg px-4 py-1.5 text-sm font-medium"
-            >
-              Cancel
-            </button>
+            <button onClick={() => { api.put('/config', {}).then(() => { addToast('History cleared'); setConfirmClear(false); window.location.reload(); }).catch(() => addToast('Failed to clear history', 'error')); }} className="bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-1.5 text-sm font-medium whitespace-nowrap">Yes, Clear</button>
+            <button onClick={() => setConfirmClear(false)} className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg px-4 py-1.5 text-sm font-medium">Cancel</button>
           </div>
         )}
-      </div>
+      </Section>
     </div>
   );
 }
