@@ -8,8 +8,19 @@ function connect() {
   const token = localStorage.getItem('token');
   if (!token) return; // Don't connect without auth
 
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  ws = new WebSocket(`${protocol}//${window.location.host}/ws?token=${token}`);
+  const backendUrl = import.meta.env.VITE_API_URL || '';
+  let wsUrl;
+  if (backendUrl) {
+    // Separate backend deployment
+    const url = new URL(backendUrl);
+    const protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    wsUrl = `${protocol}//${url.host}/ws?token=${token}`;
+  } else {
+    // Same origin (dev or single deployment)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    wsUrl = `${protocol}//${window.location.host}/ws?token=${token}`;
+  }
+  ws = new WebSocket(wsUrl);
 
   ws.onmessage = (event) => {
     try {
