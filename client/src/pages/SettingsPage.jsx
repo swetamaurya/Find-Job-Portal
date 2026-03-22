@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, TestTube, Upload, Trash2, Eye, EyeOff, User, FileText, ChevronDown, ChevronRight } from 'lucide-react';
+import { Save, TestTube, Upload, Trash2, Eye, EyeOff, User, FileText, ChevronDown, ChevronRight, Settings, KeyRound, Mail, FileUp, AlertTriangle } from 'lucide-react';
 import api from '../lib/api';
 import { useStore } from '../store';
 
@@ -126,17 +126,19 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-3 max-w-3xl">
-      <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+      <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <Settings size={22} className="text-blue-600" /> Settings
+      </h2>
 
-      <Section title="Email Credentials" open={openSection === 'credentials'} onToggle={() => toggle('credentials')}>
+      <Section title="Email Credentials" icon={<KeyRound size={18} className="text-blue-500" />} open={openSection === 'credentials'} onToggle={() => toggle('credentials')}>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Sender Email</label>
-            <input type="email" value={credentials.senderEmail} onChange={(e) => setCredentials((p) => ({ ...p, senderEmail: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            <input type="email" value={credentials.senderEmail} onChange={(e) => setCredentials((p) => ({ ...p, senderEmail: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
             <label className="block text-sm text-gray-600 mb-1">Sender Name</label>
-            <input type="text" value={credentials.senderName} onChange={(e) => setCredentials((p) => ({ ...p, senderName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            <input type="text" value={credentials.senderName} onChange={(e) => setCredentials((p) => ({ ...p, senderName: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
         </div>
         <div>
@@ -145,7 +147,7 @@ export default function SettingsPage() {
             {config.hasPassword && <span className="ml-2 text-green-600 font-medium text-xs bg-green-50 px-2 py-0.5 rounded-full">Saved</span>}
           </label>
           <div className="relative">
-            <input type={showAppPassword ? 'text' : 'password'} value={credentials.appPassword} onChange={(e) => setCredentials((p) => ({ ...p, appPassword: e.target.value }))} placeholder="Enter Gmail App Password" autoComplete="new-password" className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm" />
+            <input type={showAppPassword ? 'text' : 'password'} value={credentials.appPassword} onChange={(e) => setCredentials((p) => ({ ...p, appPassword: e.target.value }))} placeholder="Enter Gmail App Password" autoComplete="new-password" className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <button type="button" onClick={() => setShowAppPassword((v) => !v)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
               {showAppPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -159,10 +161,14 @@ export default function SettingsPage() {
             <TestTube size={16} /> {testing ? 'Testing...' : 'Test Connection'}
           </button>
         </div>
-        {testResult && <p className={`text-sm ${testResult.success ? 'text-green-600' : 'text-red-600'}`}>{testResult.message}</p>}
+        {testResult && (
+          <div className={`text-sm px-3 py-2 rounded-lg ${testResult.success ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+            {testResult.message}
+          </div>
+        )}
       </Section>
 
-      <Section title="Profile Info" icon={<User size={18} />} open={openSection === 'profile'} onToggle={() => toggle('profile')}>
+      <Section title="Profile Info" icon={<User size={18} className="text-purple-500" />} open={openSection === 'profile'} onToggle={() => toggle('profile')}>
         <p className="text-xs text-gray-500">Used to auto-generate email templates in Structured mode.</p>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -203,7 +209,7 @@ export default function SettingsPage() {
         </button>
       </Section>
 
-      <Section title="Email Template" open={openSection === 'template'} onToggle={() => toggle('template')}>
+      <Section title="Email Template" icon={<FileText size={18} className="text-green-500" />} open={openSection === 'template'} onToggle={() => toggle('template')}>
         <div className="flex gap-4">
           <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
             <input type="radio" name="templateMode" checked={(config.emailTemplateMode || 'structured') === 'structured'} onChange={() => updateConfig({ emailTemplateMode: 'structured' })} className="text-blue-600" />
@@ -243,19 +249,19 @@ export default function SettingsPage() {
         )}
       </Section>
 
-      <Section title="Email & DM Settings" open={openSection === 'emaildm'} onToggle={() => toggle('emaildm')}>
+      <Section title="Email & DM Settings" icon={<Mail size={18} className="text-orange-500" />} open={openSection === 'emaildm'} onToggle={() => toggle('emaildm')}>
         <div>
           <label className="block text-sm text-gray-600 mb-1">Email Subject</label>
-          <input type="text" value={config.emailSubject || ''} onChange={(e) => updateConfig({ emailSubject: e.target.value })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+          <input type="text" value={config.emailSubject || ''} onChange={(e) => updateConfig({ emailSubject: e.target.value })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Delay between batches (ms)</label>
-            <input type="number" value={config.emailDelay || 5000} onChange={(e) => updateConfig({ emailDelay: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            <input type="number" value={config.emailDelay || 5000} onChange={(e) => updateConfig({ emailDelay: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
             <label className="block text-sm text-gray-600 mb-1">Batch size</label>
-            <input type="number" value={config.emailBatchSize || 2} onChange={(e) => updateConfig({ emailBatchSize: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            <input type="number" value={config.emailBatchSize || 2} onChange={(e) => updateConfig({ emailBatchSize: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
         </div>
         <div className="border-t border-gray-100 pt-4 space-y-3">
@@ -270,22 +276,26 @@ export default function SettingsPage() {
         </div>
       </Section>
 
-      <Section title="Resume" open={openSection === 'resume'} onToggle={() => toggle('resume')}>
-        {config.resumeFilename && <p className="text-sm text-gray-600">Current: <span className="font-medium">{config.resumeFilename}</span></p>}
-        <div className="flex gap-3">
-          <label className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-lg px-4 py-2 text-sm cursor-pointer w-fit">
-            <Upload size={16} /> Upload Resume (PDF)
-            <input type="file" accept=".pdf" onChange={uploadResume} className="hidden" />
-          </label>
-          {config.resumeFilename && (
-            <button onClick={async () => { try { const r = await api.get('/config/resume', { responseType: 'blob' }); window.open(URL.createObjectURL(r.data), '_blank'); } catch { addToast('Failed to load resume', 'error'); } }} className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-4 py-2 text-sm font-medium">
-              <FileText size={16} /> Preview
+      <Section title="Resume" icon={<FileUp size={18} className="text-cyan-500" />} open={openSection === 'resume'} onToggle={() => toggle('resume')}>
+        {config.resumeFilename && (
+          <div className="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
+            <FileText size={20} className="text-red-500 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-800 truncate">{config.resumeFilename}</p>
+              <p className="text-xs text-gray-400">Attached to outgoing emails</p>
+            </div>
+            <button onClick={async () => { try { const r = await api.get('/config/resume', { responseType: 'blob' }); window.open(URL.createObjectURL(r.data), '_blank'); } catch { addToast('Failed to load resume', 'error'); } }} className="flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg px-3 py-1.5 text-xs font-medium flex-shrink-0">
+              <Eye size={14} /> View
             </button>
-          )}
-        </div>
+          </div>
+        )}
+        <label className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-lg px-4 py-2 text-sm cursor-pointer w-fit transition-colors">
+          <Upload size={16} /> {config.resumeFilename ? 'Replace Resume' : 'Upload Resume (PDF)'}
+          <input type="file" accept=".pdf" onChange={uploadResume} className="hidden" />
+        </label>
       </Section>
 
-      <Section title="Danger Zone" borderColor="border-red-200" open={openSection === 'danger'} onToggle={() => toggle('danger')}>
+      <Section title="Danger Zone" icon={<AlertTriangle size={18} className="text-red-500" />} borderColor="border-red-200" open={openSection === 'danger'} onToggle={() => toggle('danger')}>
         <p className="text-sm text-gray-500">These actions cannot be undone.</p>
         {!confirmClear ? (
           <button onClick={() => setConfirmClear(true)} className="flex items-center gap-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg px-4 py-2 text-sm font-medium">

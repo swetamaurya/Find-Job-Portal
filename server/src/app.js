@@ -34,8 +34,9 @@ app.get('/api/users', auth, async (req, res) => {
     const users = await User.find({}, { password: 0, gmailAppPassword: 0 }).sort({ createdAt: -1 }).lean();
     const usersWithStats = await Promise.all(users.map(async (u) => {
       const emailsSent = await SentEmail.countDocuments({ userId: u._id });
-      const dmsSent = await SentDM.countDocuments({ userId: u._id });
-      return { ...u, emailsSent, dmsSent };
+      const dmsSent = await SentDM.countDocuments({ userId: u._id, status: 'dm_sent' });
+      const connectsSent = await SentDM.countDocuments({ userId: u._id, status: 'connected' });
+      return { ...u, emailsSent, dmsSent, connectsSent };
     }));
     res.json({ users: usersWithStats, total: usersWithStats.length });
   } catch {

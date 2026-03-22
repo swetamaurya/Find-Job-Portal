@@ -138,17 +138,17 @@ export default function SearchPage() {
           <h3 className="font-semibold text-gray-800 mb-3 text-sm">Search Complete</h3>
           <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
             {[
-              { label: 'Emails', value: searchProgress.totalEmails || 0, color: 'blue' },
-              { label: 'New', value: searchProgress.newEmails || 0, color: 'green' },
-              { label: 'Already Sent', value: searchProgress.alreadySentEmails || 0, color: 'gray' },
-              { label: 'Posts', value: searchProgress.totalPosts || 0, color: 'orange' },
-              { label: 'Profiles', value: searchProgress.totalProfiles || 0, color: 'purple' },
-              { label: 'New', value: searchProgress.newProfiles || 0, color: 'green' },
-              { label: 'Already DMed', value: searchProgress.alreadyDMedProfiles || 0, color: 'gray' },
+              { label: 'Emails', value: searchProgress.totalEmails || 0, bg: 'bg-blue-50', text: 'text-blue-700', sub: 'text-blue-500' },
+              { label: 'New', value: searchProgress.newEmails || 0, bg: 'bg-green-50', text: 'text-green-700', sub: 'text-green-500' },
+              { label: 'Already Sent', value: searchProgress.alreadySentEmails || 0, bg: 'bg-gray-50', text: 'text-gray-700', sub: 'text-gray-500' },
+              { label: 'Posts', value: searchProgress.totalPosts || 0, bg: 'bg-orange-50', text: 'text-orange-700', sub: 'text-orange-500' },
+              { label: 'Profiles', value: searchProgress.totalProfiles || 0, bg: 'bg-purple-50', text: 'text-purple-700', sub: 'text-purple-500' },
+              { label: 'New', value: searchProgress.newProfiles || 0, bg: 'bg-green-50', text: 'text-green-700', sub: 'text-green-500' },
+              { label: 'Already DMed', value: searchProgress.alreadyDMedProfiles || 0, bg: 'bg-gray-50', text: 'text-gray-700', sub: 'text-gray-500' },
             ].map((s, i) => (
-              <div key={i} className={`bg-${s.color}-50 rounded-lg p-3 text-center`}>
-                <p className={`text-xl font-bold text-${s.color}-700`}>{s.value}</p>
-                <p className={`text-[10px] text-${s.color}-500 mt-0.5`}>{s.label}</p>
+              <div key={i} className={`${s.bg} rounded-lg p-3 text-center`}>
+                <p className={`text-xl font-bold ${s.text}`}>{s.value}</p>
+                <p className={`text-[10px] ${s.sub} mt-0.5`}>{s.label}</p>
               </div>
             ))}
           </div>
@@ -267,10 +267,7 @@ export default function SearchPage() {
       </div>
 
       {/* Live Log */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Live Log</h3>
-        <LiveLog />
-      </div>
+      <LiveLog />
     </div>
   );
 }

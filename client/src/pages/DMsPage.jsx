@@ -246,10 +246,7 @@ export default function DMsPage() {
       </div>
 
       {/* Live Log */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Live Log</h3>
-        <LiveLog />
-      </div>
+      <LiveLog />
     </div>
   );
 }

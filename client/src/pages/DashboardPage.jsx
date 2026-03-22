@@ -140,10 +140,7 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Activity Log</h3>
-        <LiveLog maxHeight="400px" />
-      </div>
+      <LiveLog maxHeight="400px" />
     </div>
   );
 }
