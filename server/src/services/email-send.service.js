@@ -40,9 +40,9 @@ function generateEmailHTML(user, cfg) {
 
   let expLine = '';
   if (experience) {
-    expLine = `<p>I'm <strong>${name}</strong> — I've been working as a <strong>${role}</strong> for <strong>${experience}</strong>${skills ? `, primarily with <strong>${skills}</strong>` : ''}.</p>`;
+    expLine = `<p>I'm <strong>${name}</strong> — I've been working as a ${role} for ${experience}${skills ? `, primarily with ${skills}` : ''}.</p>`;
   } else {
-    expLine = `<p>I'm <strong>${name}</strong>, a <strong>${role}</strong>${skills ? ` skilled in <strong>${skills}</strong>` : ''}.</p>`;
+    expLine = `<p>I'm <strong>${name}</strong>, a ${role}${skills ? ` skilled in ${skills}` : ''}.</p>`;
   }
 
   let linksHtml = '';
@@ -58,7 +58,7 @@ function generateEmailHTML(user, cfg) {
 <p>Hi,</p>
 <p>I saw your recent post on LinkedIn about the role and thought I'd reach out directly.</p>
 ${expLine}
-<p>I'm currently exploring new opportunities and can <strong>join immediately</strong> — happy to discuss <strong>full-time, part-time, or freelance</strong> arrangements.</p>
+<p>I'm currently exploring new opportunities and can <strong>join immediately</strong> — happy to discuss full-time, part-time, or freelance arrangements.</p>
 <p>I've attached my resume. Let me know if this seems like a good fit.</p>
 <p style="margin-top:20px;">Thanks,<br>
 <strong>${name}</strong>${phone ? `<br>${phone}` : ''}${email ? `<br><a href="mailto:${email}">${email}</a>` : ''}</p>

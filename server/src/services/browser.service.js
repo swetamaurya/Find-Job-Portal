@@ -55,6 +55,12 @@ async function launch(userId) {
   });
 
   const page = await browser.newPage();
+
+  // Dismiss any Chrome error dialogs (e.g. "Something went wrong when opening your profile")
+  page.on('dialog', async (dialog) => {
+    try { await dialog.accept(); } catch {}
+  });
+
   userBrowsers.set(key, { browser, page });
 
   log('Browser launched!', userId);

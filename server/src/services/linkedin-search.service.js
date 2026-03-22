@@ -351,6 +351,16 @@ async function searchOneQuery(tabPage, query, cfg, state, userId) {
   } catch {}
   await randomSleep(2000, 3000);
 
+  // Check if redirected to login page
+  try {
+    const currentUrl = tabPage.url();
+    if (currentUrl.includes('/login') || currentUrl.includes('/authwall') || currentUrl.includes('about:blank')) {
+      log(`LinkedIn session expired — login required`, userId);
+      broadcast('auth:login-required', {}, userId);
+      return { emails: [], posts: [], profiles: [] };
+    }
+  } catch {}
+
   let hasResults = true;
   try {
     hasResults = await tabPage.evaluate(() => {
@@ -397,17 +407,19 @@ async function searchOneQuery(tabPage, query, cfg, state, userId) {
   let extracted;
   try {
     extracted = await extractFromPage(tabPage, cfg.skipKeywords || []);
-  } catch {
+  } catch (err) {
+    log(`[DEBUG] extractFromPage error: ${err.message}`, userId);
     extracted = { emails: [], posts: [], profiles: [] };
   }
 
   // Debug log filter stats
   if (extracted._debug) {
     const d = extracted._debug;
-    console.log(`[SEARCH-DEBUG] "${query}" | skipKw: [${(cfg.skipKeywords || []).join(', ')}]`);
-    console.log(`[SEARCH-DEBUG] Method1(chunks): total=${d.totalChunks} short=${d.tooShort} skipKw=${d.skippedByKeyword} seeker=${d.jobSeekerSkip} exp=${d.expSkip} notJob=${d.notJobRelated} domainFiltered=${d.domainFiltered} passed=${d.passed}`);
-    console.log(`[SEARCH-DEBUG] Method2(posts): total=${d.totalPosts} short=${d.postTooShort} skipKw=${d.postSkipKw} seeker=${d.postJobSeeker} exp=${d.postExpSkip} notJob=${d.postNotJob} noProfile=${d.postNoProfile} notRelevant=${d.postNotRelevant} passed=${d.postPassed}`);
-    console.log(`[SEARCH-DEBUG] Results: emails=${extracted.emails.length} profiles=${extracted.profiles.length}`);
+    const skipKwStr = (cfg.skipKeywords || []).length > 0 ? (cfg.skipKeywords || []).join(', ') : 'none';
+    log(`[DEBUG] "${query}" | skipKw: [${skipKwStr}]`, userId);
+    log(`[DEBUG] Chunks: ${d.totalChunks} total | ${d.tooShort} short | ${d.skippedByKeyword} skipKw | ${d.jobSeekerSkip} seeker | ${d.expSkip} exp | ${d.notJobRelated} notJob | ${d.domainFiltered} domainFilter | ${d.passed} passed`, userId);
+    log(`[DEBUG] Posts: ${d.totalPosts} total | ${d.postTooShort} short | ${d.postSkipKw} skipKw | ${d.postJobSeeker} seeker | ${d.postExpSkip} exp | ${d.postNotJob} notJob | ${d.postNoProfile} noProfile | ${d.postNotRelevant} notRelevant | ${d.postPassed} passed`, userId);
+    log(`[DEBUG] Result: ${extracted.emails.length} emails, ${extracted.profiles.length} profiles`, userId);
     delete extracted._debug;
   }
 
@@ -432,6 +444,27 @@ async function startSearch(userId) {
 
   const cfg = await loadConfig(userId);
   const page = await browserService.ensurePage(userId);
+
+  // Check if LinkedIn is logged in before starting search
+  try {
+    const url = page.url();
+    if (!url.includes('linkedin.com') || url.includes('/login') || url.includes('/authwall') || url.includes('about:blank')) {
+      // Try navigating to LinkedIn feed first
+      log('LinkedIn not ready, navigating to feed...', userId);
+      try {
+        await page.goto('https://www.linkedin.com/feed/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+      } catch {}
+      await sleep(5000);
+      const currentUrl = page.url();
+      if (currentUrl.includes('/login') || currentUrl.includes('/authwall') || currentUrl.includes('about:blank')) {
+        state.isSearching = false;
+        log('LinkedIn login required! Please log in via the browser window and try again.', userId);
+        broadcast('auth:login-required', {}, userId);
+        broadcast('search:complete', { totalEmails: 0, totalProfiles: 0, totalPosts: 0, error: 'Login required' }, userId);
+        return { emails: [], profiles: [], jobPosts: [] };
+      }
+    }
+  } catch {}
   const allEmails = new Map();
   const allProfiles = [];
   const allJobs = [];

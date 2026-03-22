@@ -17,7 +17,16 @@
       "Bash(npx:*)",
       "Bash(ls:*)",
       "Bash(mongosh \"mongodb+srv://tarunmehto71_db_user:jobemail@storeemailjob.y7diiv1.mongodb.net/StoreEmailJob?appName=StoreEmailJob\" --eval 'db.sentdms.deleteMany\\({ userId: ObjectId\\(\"\"67bf088c8441db87e67cad9a\"\"\\) }\\)')",
-      "Bash(mongosh:*)"
+      "Bash(mongosh:*)",
+      "Bash(pgrep:*)",
+      "Bash(ps:*)",
+      "Bash(pkill:*)",
+      "WebSearch",
+      "WebFetch(domain:support.captaindata.com)",
+      "WebFetch(domain:leadhootz.com)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:saleleads.ai)",
+      "WebFetch(domain:www.linkedin.com)"
     ]
   }
 }

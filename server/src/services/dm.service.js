@@ -450,19 +450,26 @@ async function sendSingleDM(page, profileUrl, message, connectionNote, index, to
         if (messageButton) {
           const dmResult = await sendDirectMessage(page, messageButton, message, index, total);
           if (dmResult.success) return dmResult;
+          console.log(`[DM-DEBUG] ${index + 1}/${total} DM failed: ${dmResult.reason} → falling back to connection`);
           // Fallback to connection request if DM fails for any recoverable reason
           const fallbackReasons = ['premium_required', 'compose_box_not_found', 'message_not_typed'];
           if (sendConnectionReq && fallbackReasons.includes(dmResult.reason)) {
             await page.goto(profileUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
             await randomSleep(1500, 2500);
-            return await sendConnectionRequest(page, connectionNote, index, total);
+            const connResult = await sendConnectionRequest(page, connectionNote, index, total);
+            connResult.dmFailReason = dmResult.reason;
+            return connResult;
           }
           return dmResult;
         }
+      } else {
+        console.log(`[DM-DEBUG] ${index + 1}/${total} No Message button found → trying connection`);
       }
 
       if (sendConnectionReq) {
-        return await sendConnectionRequest(page, connectionNote, index, total);
+        const connResult = await sendConnectionRequest(page, connectionNote, index, total);
+        connResult.dmFailReason = 'no_message_button';
+        return connResult;
       }
 
       return { success: false, method: 'none', reason: 'no_message_button' };
@@ -517,6 +524,20 @@ async function sendAllDMs(userId, profiles) {
     if (state.shouldStop) break;
     const profile = toProcess[i];
 
+    // Check if browser is still alive before each DM
+    try {
+      await page.title();
+    } catch {
+      log(`Browser disconnected after ${i} DMs. Stopping.`, userId);
+      // Try to get a fresh page
+      try {
+        page = await browserService.ensurePage(userId);
+      } catch {
+        log('Browser is dead. Cannot continue DMs.', userId);
+        break;
+      }
+    }
+
     broadcast('dm:sending', { index: i, total: toProcess.length, name: profile.posterName, profileUrl: profile.profileUrl }, userId);
 
     const result = await sendSingleDM(
@@ -529,10 +550,17 @@ async function sendAllDMs(userId, profiles) {
       if (result.method === 'connect') connectSent++;
       await saveSentDM(userId, profile.profileUrl, result.method === 'dm' ? 'dm_sent' : 'connected');
       broadcast('dm:sent', { index: i, method: result.method, name: profile.posterName }, userId);
-      log(`[DM ${i + 1}/${toProcess.length}] ${profile.posterName || 'Unknown'} — ${result.method === 'dm' ? 'DM sent' : 'Connection sent'}`, userId);
+      const dmFailInfo = result.dmFailReason ? ` (DM failed: ${result.dmFailReason})` : '';
+      log(`[DM ${i + 1}/${toProcess.length}] ${profile.posterName || 'Unknown'} — ${result.method === 'dm' ? 'DM sent' : 'Connection sent'}${dmFailInfo}`, userId);
     } else {
       failed++;
-      log(`[DM ${i + 1}/${toProcess.length}] ${profile.posterName || 'Unknown'} — ${result.reason}`, userId);
+      // If protocol error, browser is dead — stop loop
+      if (result.reason && result.reason.includes('Protocol error')) {
+        log(`[DM ${i + 1}/${toProcess.length}] ${profile.posterName || 'Unknown'} — Browser crashed, stopping DMs`, userId);
+        break;
+      }
+      const dmFailInfo = result.dmFailReason ? `DM: ${result.dmFailReason}, Connect: ${result.reason}` : result.reason;
+      log(`[DM ${i + 1}/${toProcess.length}] ${profile.posterName || 'Unknown'} — ${dmFailInfo}`, userId);
       await saveSentDM(userId, profile.profileUrl, result.reason || 'failed');
       broadcast('dm:failed', { index: i, reason: result.reason, name: profile.posterName }, userId);
     }

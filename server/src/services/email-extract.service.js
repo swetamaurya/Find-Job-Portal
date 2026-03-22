@@ -2,8 +2,6 @@ const IGNORED_DOMAINS = [
   'linkedin.com', 'licdn.com', 'example.com', 'email.com',
   'yourmail.com', 'xyz.com', 'abc.com', 'test.com',
   'sentry.io', 'w3.org', 'schema.org', 'googleapis.com',
-  'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com',
-  'protonmail.com', 'icloud.com', 'rediffmail.com',
 ];
 
 function isValidEmail(email) {

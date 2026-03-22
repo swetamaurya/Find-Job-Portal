@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Play, Square, Plus, X, Monitor } from 'lucide-react';
+import { Play, Square, Plus, X, Monitor, MapPin } from 'lucide-react';
 import api from '../lib/api';
 import ProgressBar from '../components/common/ProgressBar';
 import LiveLog from '../components/common/LiveLog';
 import { useStore } from '../store';
 
 
+
+const CITIES = [
+  { name: 'Delhi', geoId: '102890719' },
+  { name: 'Noida', geoId: '106290293' },
+  { name: 'Gurugram', geoId: '115884833' },
+  { name: 'Bengaluru', geoId: '105214831' },
+  { name: 'Pune', geoId: '103671728' },
+  { name: 'Mumbai', geoId: '106164952' },
+];
 
 export default function SearchPage() {
   const [config, setConfig] = useState(null);
@@ -206,7 +215,7 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <h3 className="font-semibold text-gray-800 mb-3">Date Filter</h3>
           <select
@@ -232,19 +241,61 @@ export default function SearchPage() {
           />
           <p className="text-sm text-gray-500 mt-1">{config.scrollCount} scrolls per query</p>
         </div>
+      </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="font-semibold text-gray-800 mb-3">Location Filter</h3>
-          <label className="flex items-center gap-2 text-sm text-gray-700">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <MapPin size={18} className="text-blue-600" />
+            <h3 className="font-semibold text-gray-800">Location Filter</h3>
+          </div>
+          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
             <input
               type="checkbox"
               checked={config.locationFilter}
-              onChange={(e) => saveConfig({ locationFilter: e.target.checked })}
+              onChange={(e) => {
+                const updates = { locationFilter: e.target.checked };
+                if (e.target.checked && (!config.geoIds || config.geoIds.length === 0)) {
+                  updates.geoIds = CITIES.map((c) => c.geoId);
+                }
+                saveConfig(updates);
+              }}
               className="rounded"
             />
-            Enable Delhi NCR filter
+            Enable
           </label>
         </div>
+        {config.locationFilter && (
+          <div className="flex flex-wrap gap-2">
+            {CITIES.map((city) => {
+              const isSelected = (config.geoIds || []).includes(city.geoId);
+              return (
+                <button
+                  key={city.geoId}
+                  onClick={() => {
+                    const current = config.geoIds || [];
+                    const updated = isSelected
+                      ? current.filter((id) => id !== city.geoId)
+                      : [...current, city.geoId];
+                    saveConfig({ geoIds: updated });
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                    isSelected
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                  }`}
+                >
+                  {city.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {config.locationFilter && (
+          <p className="text-xs text-gray-400 mt-3">
+            {(config.geoIds || []).length} city selected — search results will be filtered by these locations
+          </p>
+        )}
       </div>
 
       <div>
