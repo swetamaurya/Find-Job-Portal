@@ -96,15 +96,15 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h2>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-500">Browser:</span>
           <StatusBadge status={browserStatus} />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <StatCard icon={Mail} label="Total Emails Found" value={stats.totalEmails || 0} color="blue" />
         <StatCard icon={Mail} label="New (Unsent)" value={Math.max(0, (stats.totalEmails || 0) - (stats.sentEmailsCount || 0))} color="orange" />
         <StatCard icon={Send} label="Emails Sent" value={stats.sentEmailsCount || 0} color="green" />
@@ -112,31 +112,31 @@ export default function DashboardPage() {
         <StatCard icon={UserPlus} label="Connections Sent" value={stats.connectSentCount || 0} color="blue" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <button
           onClick={browserStatus === 'stopped' ? launchBrowser : runPipeline}
           disabled={loading || searchProgress.running || emailProgress.running}
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-6 py-4 font-medium transition-colors"
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-3 sm:px-6 sm:py-4 font-medium transition-colors text-sm sm:text-base"
         >
           {browserStatus === 'stopped' ? (
-            <><Monitor size={20} /> Launch Browser</>
+            <><Monitor size={18} /> Launch Browser</>
           ) : (
-            <><Play size={20} /> Run Full Pipeline</>
+            <><Play size={18} /> Run Full Pipeline</>
           )}
         </button>
         <button
           onClick={sendUnsent}
           disabled={emailProgress.running}
-          className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg px-6 py-4 font-medium transition-colors"
+          className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-3 sm:px-6 sm:py-4 font-medium transition-colors text-sm sm:text-base"
         >
-          <Send size={20} /> Send Unsent Emails
+          <Send size={18} /> Send Unsent Emails
         </button>
         <button
           onClick={closeBrowser}
           disabled={browserStatus === 'stopped' || searchProgress.running || emailProgress.running}
-          className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg px-6 py-4 font-medium transition-colors"
+          className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-3 sm:px-6 sm:py-4 font-medium transition-colors text-sm sm:text-base"
         >
-          <Square size={20} /> Stop Browser
+          <Square size={18} /> Stop Browser
         </button>
       </div>
 

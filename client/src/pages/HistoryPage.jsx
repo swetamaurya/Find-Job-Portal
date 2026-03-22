@@ -62,7 +62,7 @@ export default function HistoryPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
           <Clock size={22} className="text-blue-600" /> History
         </h2>
         <button onClick={fetchHistory} className="flex items-center gap-1 text-gray-500 hover:text-gray-900 text-sm px-2 py-1.5">
@@ -71,18 +71,18 @@ export default function HistoryPage() {
       </div>
 
       {/* Tabs + Search */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex gap-1.5">
-          <button onClick={() => { setTab('emails'); setSearchText(''); }} className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'emails' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+          <button onClick={() => { setTab('emails'); setSearchText(''); }} className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${tab === 'emails' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
             <Mail size={14} /> Emails ({sentEmails.length})
           </button>
-          <button onClick={() => { setTab('dms'); setSearchText(''); }} className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'dms' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-            <MessageSquare size={14} /> DMs & Connections ({sentDMs.length})
+          <button onClick={() => { setTab('dms'); setSearchText(''); }} className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${tab === 'dms' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+            <MessageSquare size={14} /> DMs ({sentDMs.length})
           </button>
         </div>
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input type="text" value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder={tab === 'emails' ? 'Search emails...' : 'Search profiles...'} className="border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input type="text" value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder={tab === 'emails' ? 'Search emails...' : 'Search profiles...'} className="border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-sm w-full sm:w-52 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
       </div>
 
@@ -102,7 +102,7 @@ export default function HistoryPage() {
 
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="max-h-[550px] overflow-y-auto">
+        <div className="max-h-[550px] overflow-auto">
           {tab === 'emails' && (
             <table className="w-full text-sm">
               <thead className="sticky top-0 z-10">

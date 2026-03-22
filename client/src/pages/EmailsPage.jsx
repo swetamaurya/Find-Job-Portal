@@ -85,24 +85,24 @@ export default function EmailsPage() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
           <Mail size={22} className="text-blue-600" /> Emails
         </h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button onClick={fetchEmails} className="flex items-center gap-1 text-gray-500 hover:text-gray-900 text-sm px-2 py-1.5">
             <RefreshCw size={14} />
           </button>
           {emailProgress.running ? (
-            <button onClick={stopSending} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2 text-sm font-medium">
+            <button onClick={stopSending} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-lg px-3 sm:px-4 py-2 text-sm font-medium">
               <Square size={16} /> Stop
             </button>
           ) : (
             <>
-              <button onClick={sendSelected} disabled={selectedRows.size === 0} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-sm font-medium">
-                <Send size={14} /> Send Selected ({selectedRows.size})
+              <button onClick={sendSelected} disabled={selectedRows.size === 0} className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-3 py-2 text-xs sm:text-sm font-medium">
+                <Send size={14} /> Selected ({selectedRows.size})
               </button>
-              <button onClick={sendAll} disabled={counts.new === 0} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-sm font-medium">
+              <button onClick={sendAll} disabled={counts.new === 0} className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg px-3 py-2 text-xs sm:text-sm font-medium">
                 <Send size={14} /> Send All ({counts.new})
               </button>
             </>
@@ -140,11 +140,11 @@ export default function EmailsPage() {
 
       {/* Search + Filter */}
       <div className="flex gap-3 items-center flex-wrap">
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input type="text" value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Search emails..." className="border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input type="text" value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Search emails..." className="border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-sm w-full sm:w-56 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5 flex-wrap">
           {[
             { key: 'all', label: 'All', count: counts.total },
             { key: 'new', label: 'New', count: counts.new },
@@ -163,8 +163,8 @@ export default function EmailsPage() {
 
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="max-h-[500px] overflow-y-auto">
-          <table className="w-full text-sm">
+        <div className="max-h-[500px] overflow-auto">
+          <table className="w-full text-sm min-w-[400px]">
             <thead className="sticky top-0 z-10">
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="py-3 px-4 text-left w-10">

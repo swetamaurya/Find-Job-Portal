@@ -87,16 +87,16 @@ export default function SearchPage() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
           <Search size={22} className="text-blue-600" /> LinkedIn Search
         </h2>
         {!searchProgress.running ? (
-          <button onClick={startSearch} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm">
+          <button onClick={startSearch} className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm">
             <Play size={16} /> Start Search
           </button>
         ) : (
-          <button onClick={stopSearch} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm">
+          <button onClick={stopSearch} className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm">
             <Square size={16} /> Stop
           </button>
         )}
@@ -104,9 +104,9 @@ export default function SearchPage() {
 
       {/* Progress */}
       {searchProgress.running && (
-        <div className="bg-white rounded-xl shadow-sm border border-blue-100 p-5 space-y-3">
+        <div className="bg-white rounded-xl shadow-sm border border-blue-100 p-4 sm:p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+            <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-sm sm:text-base">
               <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" /> Search Progress
             </h3>
             <span className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full">Running</span>
@@ -115,14 +115,14 @@ export default function SearchPage() {
           {searchProgress.scroll && (
             <ProgressBar current={searchProgress.scroll} total={searchProgress.scrollTotal} label="Scrolling..." />
           )}
-          <div className="grid grid-cols-2 gap-3 pt-1">
-            <div className="flex items-center gap-3 text-sm bg-gray-50 rounded-lg px-3 py-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="flex items-center gap-2 sm:gap-3 text-sm bg-gray-50 rounded-lg px-3 py-2">
               <span className="text-gray-500">Emails:</span>
               <strong className="text-blue-600">{searchProgress.totalEmails || 0}</strong>
               <span className="text-green-600 text-xs">{searchProgress.newEmails || 0} new</span>
               <span className="text-gray-400 text-xs">{searchProgress.alreadySentEmails || 0} sent</span>
             </div>
-            <div className="flex items-center gap-3 text-sm bg-gray-50 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 sm:gap-3 text-sm bg-gray-50 rounded-lg px-3 py-2">
               <span className="text-gray-500">Profiles:</span>
               <strong className="text-purple-600">{searchProgress.totalProfiles || 0}</strong>
               <span className="text-green-600 text-xs">{searchProgress.newProfiles || 0} new</span>
@@ -134,9 +134,9 @@ export default function SearchPage() {
 
       {/* Results Summary */}
       {!searchProgress.running && searchProgress.completed && (
-        <div className="bg-white rounded-xl shadow-sm border border-green-200 p-5">
+        <div className="bg-white rounded-xl shadow-sm border border-green-200 p-4 sm:p-5">
           <h3 className="font-semibold text-gray-800 mb-3 text-sm">Search Complete</h3>
-          <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
             {[
               { label: 'Emails', value: searchProgress.totalEmails || 0, bg: 'bg-blue-50', text: 'text-blue-700', sub: 'text-blue-500' },
               { label: 'New', value: searchProgress.newEmails || 0, bg: 'bg-green-50', text: 'text-green-700', sub: 'text-green-500' },

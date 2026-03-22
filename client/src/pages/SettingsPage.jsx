@@ -126,12 +126,12 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-3 max-w-3xl">
-      <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
         <Settings size={22} className="text-blue-600" /> Settings
       </h2>
 
       <Section title="Email Credentials" icon={<KeyRound size={18} className="text-blue-500" />} open={openSection === 'credentials'} onToggle={() => toggle('credentials')}>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Sender Email</label>
             <input type="email" value={credentials.senderEmail} onChange={(e) => setCredentials((p) => ({ ...p, senderEmail: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -153,11 +153,11 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
-        <div className="flex gap-3">
-          <button onClick={saveCredentials} disabled={saving} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-sm font-medium">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button onClick={saveCredentials} disabled={saving} className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-sm font-medium">
             <Save size={16} /> {saving ? 'Saving...' : 'Save Credentials'}
           </button>
-          <button onClick={testEmail} disabled={testing} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-sm font-medium">
+          <button onClick={testEmail} disabled={testing} className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-sm font-medium">
             <TestTube size={16} /> {testing ? 'Testing...' : 'Test Connection'}
           </button>
         </div>
@@ -170,7 +170,7 @@ export default function SettingsPage() {
 
       <Section title="Profile Info" icon={<User size={18} className="text-purple-500" />} open={openSection === 'profile'} onToggle={() => toggle('profile')}>
         <p className="text-xs text-gray-500">Used to auto-generate email templates in Structured mode.</p>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Role / Title</label>
             <input type="text" value={profile.role} onChange={(e) => setProfile((p) => ({ ...p, role: e.target.value }))} placeholder="e.g. Senior Backend Developer" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
@@ -184,7 +184,7 @@ export default function SettingsPage() {
           <label className="block text-sm text-gray-600 mb-1">Skills</label>
           <input type="text" value={profile.skills} onChange={(e) => setProfile((p) => ({ ...p, skills: e.target.value }))} placeholder="e.g. Node.js, Express.js, MongoDB, AWS" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Phone</label>
             <input type="text" value={profile.phone} onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
@@ -194,7 +194,7 @@ export default function SettingsPage() {
             <input type="text" value={profile.linkedinUrl} onChange={(e) => setProfile((p) => ({ ...p, linkedinUrl: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">GitHub URL</label>
             <input type="text" value={profile.githubUrl} onChange={(e) => setProfile((p) => ({ ...p, githubUrl: e.target.value }))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
@@ -254,7 +254,7 @@ export default function SettingsPage() {
           <label className="block text-sm text-gray-600 mb-1">Email Subject</label>
           <input type="text" value={config.emailSubject || ''} onChange={(e) => updateConfig({ emailSubject: e.target.value })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Delay between batches (ms)</label>
             <input type="number" value={config.emailDelay || 5000} onChange={(e) => updateConfig({ emailDelay: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />

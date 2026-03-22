@@ -32,7 +32,7 @@ export default function UsersPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
           <Users size={22} className="text-blue-600" /> Users
         </h2>
         <div className="flex items-center gap-3">
@@ -46,7 +46,8 @@ export default function UsersPage() {
       {/* Users Table */}
       {users.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[500px]">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="py-3 px-4 text-left text-gray-600 font-medium">User</th>
@@ -103,6 +104,7 @@ export default function UsersPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
