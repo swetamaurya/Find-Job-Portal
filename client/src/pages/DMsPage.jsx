@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import { MessageSquare, Square, RefreshCw } from 'lucide-react';
+import { Square, RefreshCw, Send, ChevronDown, ChevronRight, Search } from 'lucide-react';
 import api from '../lib/api';
-import DataTable from '../components/common/DataTable';
 import StatusBadge from '../components/common/StatusBadge';
 import ProgressBar from '../components/common/ProgressBar';
 import LiveLog from '../components/common/LiveLog';
 import { useStore } from '../store';
 
-
-
 export default function DMsPage() {
   const [profiles, setProfiles] = useState([]);
   const [config, setConfig] = useState({});
+  const [filter, setFilter] = useState('all');
+  const [searchText, setSearchText] = useState('');
+  const [showSettings, setShowSettings] = useState(true);
   const dmProgress = useStore((s) => s.dmProgress);
   const setDMProgress = useStore((s) => s.setDMProgress);
   const searchProgress = useStore((s) => s.searchProgress);
@@ -25,7 +25,6 @@ export default function DMsPage() {
   useEffect(() => {
     fetchProfiles();
     api.get('/config').then((r) => setConfig(r.data)).catch(() => {});
-    // Clear stale DM progress from previous session
     if (!dmProgress.running) {
       setDMProgress({ running: false });
     }
@@ -35,7 +34,6 @@ export default function DMsPage() {
     if (!dmProgress.running && (dmProgress.dmSent > 0 || dmProgress.connectSent > 0 || dmProgress.failed > 0)) fetchProfiles();
   }, [dmProgress.running]);
 
-  // Refresh when search completes (new profiles found)
   useEffect(() => {
     if (!searchProgress.running && searchProgress.completed) fetchProfiles();
   }, [searchProgress.running]);
@@ -65,9 +63,7 @@ export default function DMsPage() {
   };
 
   const stopDMs = () => {
-    api.post('/dms/stop').then(() => {
-      addToast('DM sending stopped');
-    }).catch((err) => {
+    api.post('/dms/stop').then(() => addToast('DM sending stopped')).catch((err) => {
       addToast(err.response?.data?.error || 'Failed to stop DMs', 'error');
     });
   };
@@ -79,48 +75,54 @@ export default function DMsPage() {
     });
   };
 
-  const columns = [
-    { key: 'posterName', label: 'Name', render: (v) => v || 'Unknown' },
-    { key: 'headline', label: 'Headline', render: (v) => <span className="text-xs text-gray-500 line-clamp-1">{v || '-'}</span> },
-    {
-      key: 'profileUrl', label: 'Profile',
-      render: (v) => (
-        <a href={v} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs">
-          View
-        </a>
-      ),
-    },
-    { key: 'dmStatus', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-  ];
+  const counts = {
+    total: profiles.length,
+    new: profiles.filter((p) => p.dmStatus === 'new').length,
+    dmSent: profiles.filter((p) => p.dmStatus === 'dm sent').length,
+    connected: profiles.filter((p) => p.dmStatus === 'connected').length,
+    failed: profiles.filter((p) => ['failed', 'timeout', 'no msg btn', 'no connect btn'].includes(p.dmStatus)).length,
+  };
+
+  const filteredProfiles = profiles.filter((p) => {
+    if (filter === 'new' && p.dmStatus !== 'new') return false;
+    if (filter === 'dm_sent' && p.dmStatus !== 'dm sent') return false;
+    if (filter === 'connected' && p.dmStatus !== 'connected') return false;
+    if (filter === 'failed' && !['failed', 'timeout', 'no msg btn', 'no connect btn'].includes(p.dmStatus)) return false;
+    if (searchText) {
+      const q = searchText.toLowerCase();
+      return (p.posterName || '').toLowerCase().includes(q) || (p.headline || '').toLowerCase().includes(q);
+    }
+    return true;
+  });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">LinkedIn DMs ({profiles.length})</h2>
-        <div className="flex gap-3">
-          <button onClick={fetchProfiles} className="flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm">
-            <RefreshCw size={14} /> Refresh
+        <h2 className="text-2xl font-bold text-gray-900">LinkedIn DMs</h2>
+        <div className="flex gap-2">
+          <button onClick={fetchProfiles} className="flex items-center gap-1 text-gray-500 hover:text-gray-900 text-sm px-2 py-1.5">
+            <RefreshCw size={14} />
           </button>
           {dmProgress.running ? (
             <button onClick={stopDMs} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2 text-sm font-medium">
               <Square size={16} /> Stop
             </button>
           ) : (
-            <button onClick={startDMs} disabled={profiles.filter((p) => p.dmStatus === 'new').length === 0} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-sm font-medium">
-              <MessageSquare size={16} /> Send DMs ({profiles.filter((p) => p.dmStatus === 'new').length} new)
+            <button onClick={startDMs} disabled={counts.new === 0} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-sm font-medium">
+              <Send size={16} /> Send DMs ({counts.new} new)
             </button>
           )}
         </div>
       </div>
 
+      {/* Progress */}
       {dmProgress.running && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-3">
+        <div className="bg-white rounded-xl shadow-sm border border-blue-100 p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-gray-800">Sending DMs...</h3>
             <span className="text-sm text-gray-500">
-              DMs: <strong className="text-green-600">{dmProgress.dmSent || 0}</strong> |
-              Connects: <strong className="text-blue-600">{dmProgress.connectSent || 0}</strong> |
-              Failed: <strong className="text-red-600">{dmProgress.failed || 0}</strong>
+              <strong className="text-green-600">{dmProgress.dmSent || 0}</strong> DMs | <strong className="text-purple-600">{dmProgress.connectSent || 0}</strong> Connects | <strong className="text-red-500">{dmProgress.failed || 0}</strong> Failed
             </span>
           </div>
           <ProgressBar
@@ -131,62 +133,119 @@ export default function DMsPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="font-semibold text-gray-800 mb-3">DM Message</h3>
-          <textarea
-            value={config.dmMessage || ''}
-            onChange={(e) => updateConfig({ dmMessage: e.target.value })}
-            rows={4}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+      {/* Completion Summary */}
+      {!dmProgress.running && (dmProgress.dmSent > 0 || dmProgress.connectSent > 0) && (
+        <div className="bg-green-50 rounded-xl border border-green-200 p-4 flex items-center justify-between">
+          <p className="text-sm text-green-800">
+            DM session complete: <strong>{dmProgress.dmSent || 0}</strong> DMs sent, <strong>{dmProgress.connectSent || 0}</strong> connections, <strong>{dmProgress.failed || 0}</strong> failed
+          </p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="font-semibold text-gray-800 mb-3">Connection Note</h3>
-          <textarea
-            value={config.connectionNote || ''}
-            onChange={(e) => updateConfig({ connectionNote: e.target.value })}
-            rows={4}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <p className="text-xs text-gray-400 mt-1">Max 300 characters</p>
-        </div>
-      </div>
+      )}
 
-      <div className="flex gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex-1">
-          <label className="text-sm text-gray-600">Max DMs per session</label>
-          <input
-            type="number"
-            value={config.maxDMsPerSession || 50}
-            onChange={(e) => updateConfig({ maxDMsPerSession: parseInt(e.target.value) })}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mt-1"
-          />
-        </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex-1">
-          <label className="text-sm text-gray-600">Min delay (ms)</label>
-          <input
-            type="number"
-            value={config.dmDelayMin || 10000}
-            onChange={(e) => updateConfig({ dmDelayMin: parseInt(e.target.value) })}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mt-1"
-          />
-        </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex-1">
-          <label className="text-sm text-gray-600">Max delay (ms)</label>
-          <input
-            type="number"
-            value={config.dmDelayMax || 20000}
-            onChange={(e) => updateConfig({ dmDelayMax: parseInt(e.target.value) })}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mt-1"
-          />
-        </div>
-      </div>
-
+      {/* DM Settings - Collapsible */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <DataTable columns={columns} data={profiles} />
+        <button onClick={() => setShowSettings(!showSettings)} className="w-full flex items-center justify-between p-4 text-left">
+          <h3 className="font-semibold text-gray-800">DM Settings</h3>
+          {showSettings ? <ChevronDown size={18} className="text-gray-400" /> : <ChevronRight size={18} className="text-gray-400" />}
+        </button>
+        {showSettings && (
+          <div className="px-5 pb-5 space-y-4 border-t border-gray-50 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">DM Message</label>
+                <textarea value={config.dmMessage || ''} onChange={(e) => updateConfig({ dmMessage: e.target.value })} rows={3} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Connection Note <span className="text-gray-400">(max 300)</span></label>
+                <textarea value={config.connectionNote || ''} onChange={(e) => updateConfig({ connectionNote: e.target.value })} rows={3} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Max DMs/session</label>
+                <input type="number" value={config.maxDMsPerSession || 50} onChange={(e) => updateConfig({ maxDMsPerSession: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Min delay (ms)</label>
+                <input type="number" value={config.dmDelayMin || 10000} onChange={(e) => updateConfig({ dmDelayMin: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Max delay (ms)</label>
+                <input type="number" value={config.dmDelayMax || 20000} onChange={(e) => updateConfig({ dmDelayMax: parseInt(e.target.value) })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* Search + Filter */}
+      <div className="flex gap-3 items-center flex-wrap">
+        <div className="relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input type="text" value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Search name or headline..." className="border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div className="flex gap-1.5">
+          {[
+            { key: 'all', label: 'All', count: counts.total },
+            { key: 'new', label: 'New', count: counts.new },
+            { key: 'dm_sent', label: 'DM Sent', count: counts.dmSent },
+            { key: 'connected', label: 'Connected', count: counts.connected },
+            { key: 'failed', label: 'Failed', count: counts.failed },
+          ].map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${filter === f.key ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              {f.label} ({f.count})
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Profiles Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="max-h-[500px] overflow-y-auto">
+        <table className="w-full text-sm">
+          <thead className="sticky top-0 z-10">
+            <tr className="border-b border-gray-200 bg-gray-50">
+              <th className="py-3 px-4 text-left text-gray-600 font-medium w-8">#</th>
+              <th className="py-3 px-4 text-left text-gray-600 font-medium">Profile</th>
+              <th className="py-3 px-4 text-left text-gray-600 font-medium hidden md:table-cell">Headline</th>
+              <th className="py-3 px-4 text-left text-gray-600 font-medium">Status</th>
+              <th className="py-3 px-4 text-left text-gray-600 font-medium w-16">Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredProfiles.length === 0 && (
+              <tr><td colSpan={5} className="py-10 text-center text-gray-400">No profiles found</td></tr>
+            )}
+            {filteredProfiles.map((p, i) => (
+              <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                <td className="py-3 px-4 text-gray-400 text-xs">{i + 1}</td>
+                <td className="py-3 px-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                      {(p.posterName || '?')[0].toUpperCase()}
+                    </div>
+                    <span className="font-medium text-gray-800 truncate">{p.posterName || 'Unknown'}</span>
+                  </div>
+                </td>
+                <td className="py-3 px-4 hidden md:table-cell">
+                  <span className="text-xs text-gray-500 line-clamp-1">{p.headline || '-'}</span>
+                </td>
+                <td className="py-3 px-4"><StatusBadge status={p.dmStatus} /></td>
+                <td className="py-3 px-4">
+                  <a href={p.profileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 text-xs font-medium">View</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      {/* Live Log */}
       <div>
         <h3 className="text-lg font-semibold text-gray-800 mb-3">Live Log</h3>
         <LiveLog />

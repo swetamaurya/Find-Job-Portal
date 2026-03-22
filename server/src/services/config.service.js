@@ -85,7 +85,7 @@ async function getStats(userId) {
   } catch {}
 
   try {
-    sentDMsCount = await SentDM.countDocuments({ userId });
+    sentDMsCount = await SentDM.countDocuments({ userId, status: { $in: ['dm_sent', 'connected'] } });
   } catch {}
 
   return { totalEmails, totalProfiles, sentEmailsCount, sentDMsCount };
