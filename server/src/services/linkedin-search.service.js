@@ -39,6 +39,7 @@ async function extractFromPage(tabPage, skipKeywords) {
     (ignoredDomains, skipKw) => {
       const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
       const results = { emails: [], posts: [], profiles: [] };
+      const debug = { totalChunks: 0, tooShort: 0, skippedByKeyword: 0, jobSeekerSkip: 0, expSkip: 0, notJobRelated: 0, noEmails: 0, domainFiltered: 0, passed: 0, totalPosts: 0, postTooShort: 0, postSkipKw: 0, postJobSeeker: 0, postExpSkip: 0, postNotJob: 0, postNoProfile: 0, postNotRelevant: 0, postPassed: 0 };
       const fullPageText = document.body.innerText || '';
 
       const jobKeywords = [
@@ -104,22 +105,25 @@ async function extractFromPage(tabPage, skipKeywords) {
       );
 
       chunks.forEach((chunk) => {
-        if (chunk.length < 80) return;
+        debug.totalChunks++;
+        if (chunk.length < 80) { debug.tooShort++; return; }
         const lowerChunk = chunk.toLowerCase();
         const hasSkipKeyword = skipKw.some((kw) => lowerChunk.includes(kw.toLowerCase()));
         const hasNodeSpecific =
           lowerChunk.includes('node.js') || lowerChunk.includes('nodejs') ||
           lowerChunk.includes('express.js') || lowerChunk.includes('expressjs') ||
           lowerChunk.includes('mongodb');
-        if (hasSkipKeyword && !hasNodeSpecific) return;
-        if (isJobSeekerPost(chunk)) return;
-        if (!isExperienceMatch(chunk)) return;
+        if (hasSkipKeyword && !hasNodeSpecific) { debug.skippedByKeyword++; return; }
+        if (isJobSeekerPost(chunk)) { debug.jobSeekerSkip++; return; }
+        if (!isExperienceMatch(chunk)) { debug.expSkip++; return; }
 
         const isJobRelated = jobKeywords.some((kw) => lowerChunk.includes(kw.toLowerCase()));
         const emails = chunk.match(emailRegex) || [];
         const validEmails = emails.filter((email) => !ignoredDomains.some((d) => email.toLowerCase().includes(d)));
 
         if (isJobRelated) {
+          debug.passed++;
+          if (emails.length > 0 && validEmails.length === 0) debug.domainFiltered += emails.length;
           const snippet = chunk.substring(0, 200).replace(/\n/g, ' ').trim();
           results.posts.push({ name: 'Post', snippet, emails: validEmails });
           validEmails.forEach((email) => {
@@ -127,6 +131,8 @@ async function extractFromPage(tabPage, skipKeywords) {
               results.emails.push({ email: email.toLowerCase(), source: '', snippet: chunk.substring(0, 150) });
             }
           });
+        } else {
+          debug.notJobRelated++;
         }
       });
 
@@ -155,17 +161,18 @@ async function extractFromPage(tabPage, skipKeywords) {
       ];
 
       postEls.forEach((post) => {
+        debug.totalPosts++;
         const text = post.innerText || '';
-        if (text.length < 80) return;
+        if (text.length < 80) { debug.postTooShort++; return; }
         const lowerText = text.toLowerCase();
         const hasSkipKw = skipKw.some((kw) => lowerText.includes(kw.toLowerCase()));
         const hasNodeSpecificKw =
           lowerText.includes('node.js') || lowerText.includes('nodejs') ||
           lowerText.includes('express.js') || lowerText.includes('expressjs') ||
           lowerText.includes('mongodb');
-        if (hasSkipKw && !hasNodeSpecificKw) return;
-        if (isJobSeekerPost(text)) return;
-        if (!isExperienceMatch(text)) return;
+        if (hasSkipKw && !hasNodeSpecificKw) { debug.postSkipKw++; return; }
+        if (isJobSeekerPost(text)) { debug.postJobSeeker++; return; }
+        if (!isExperienceMatch(text)) { debug.postExpSkip++; return; }
 
         let posterProfileUrl = '';
         let posterName = '';
@@ -236,14 +243,23 @@ async function extractFromPage(tabPage, skipKeywords) {
             }
           });
         }
+        if (emails.length > 0 && validEmails.length === 0) debug.domainFiltered += emails.length;
 
         if (posterProfileUrl && isJobPost && isPosterRelevant) {
+          debug.postPassed++;
           if (!results.profiles.some((p) => p.profileUrl === posterProfileUrl)) {
             results.profiles.push({ profileUrl: posterProfileUrl, posterName, headline: posterHeadline });
           }
+        } else if (!isJobPost) {
+          debug.postNotJob++;
+        } else if (!posterProfileUrl) {
+          debug.postNoProfile++;
+        } else if (!isPosterRelevant) {
+          debug.postNotRelevant++;
         }
       });
 
+      results._debug = debug;
       return results;
     },
     IGNORED_DOMAINS,
@@ -385,6 +401,16 @@ async function searchOneQuery(tabPage, query, cfg, state, userId) {
     extracted = { emails: [], posts: [], profiles: [] };
   }
 
+  // Debug log filter stats
+  if (extracted._debug) {
+    const d = extracted._debug;
+    console.log(`[SEARCH-DEBUG] "${query}" | skipKw: [${(cfg.skipKeywords || []).join(', ')}]`);
+    console.log(`[SEARCH-DEBUG] Method1(chunks): total=${d.totalChunks} short=${d.tooShort} skipKw=${d.skippedByKeyword} seeker=${d.jobSeekerSkip} exp=${d.expSkip} notJob=${d.notJobRelated} domainFiltered=${d.domainFiltered} passed=${d.passed}`);
+    console.log(`[SEARCH-DEBUG] Method2(posts): total=${d.totalPosts} short=${d.postTooShort} skipKw=${d.postSkipKw} seeker=${d.postJobSeeker} exp=${d.postExpSkip} notJob=${d.postNotJob} noProfile=${d.postNoProfile} notRelevant=${d.postNotRelevant} passed=${d.postPassed}`);
+    console.log(`[SEARCH-DEBUG] Results: emails=${extracted.emails.length} profiles=${extracted.profiles.length}`);
+    delete extracted._debug;
+  }
+
   const pageProfiles = await extractPageProfiles(tabPage);
   if (pageProfiles.length > 0) {
     if (!extracted.profiles) extracted.profiles = [];
@@ -405,7 +431,7 @@ async function startSearch(userId) {
   state.shouldStop = false;
 
   const cfg = await loadConfig(userId);
-  const page = await browserService.ensurePage();
+  const page = await browserService.ensurePage(userId);
   const allEmails = new Map();
   const allProfiles = [];
   const allJobs = [];

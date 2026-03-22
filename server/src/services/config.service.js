@@ -10,11 +10,11 @@ function generateDefaultDM(user) {
   const role = p.role ? p.role.split('|')[0].trim() : 'Developer';
   const experience = p.experience || '';
 
-  let msg = `Hey, saw your post about the opening — seems like a great fit for my background.\n`;
-  msg += `I'm ${name}, ${role}`;
+  let msg = `Hi, came across your post and the role caught my attention.\n`;
+  msg += `I'm ${name}, a ${role}`;
   if (experience) msg += ` with ${experience}`;
-  msg += `. Currently open to new roles and can join immediately.\n`;
-  msg += `I've attached my resume to my profile. Let me know if you'd be open to a quick chat!`;
+  msg += `.\n`;
+  msg += `Would love to learn more about the position. Happy to share my resume if it's a fit!`;
   return msg;
 }
 
@@ -23,7 +23,7 @@ function generateDefaultConnectionNote(user) {
   const name = user.senderName || user.name || '';
   const role = p.role ? p.role.split('|')[0].trim() : 'Developer';
   // LinkedIn connection note max 300 chars
-  let note = `Hi, I'm ${name}, a ${role}. Saw your post and interested in connecting regarding the opportunity. Open to discuss anytime!`;
+  let note = `Hi, I'm ${name}, a ${role}. Came across your post and would love to connect regarding the role. Happy to chat anytime!`;
   return note.substring(0, 300);
 }
 

@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Search, Mail, MessageSquare, History, Settings, LogOut } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuthStore } from '../../store/authStore';
+import { useStore } from '../../store';
 import { disconnect } from '../../lib/websocket';
 
 const links = [
@@ -16,12 +18,16 @@ const links = [
 export default function Sidebar() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const addToast = useStore((s) => s.addToast);
   const navigate = useNavigate();
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleLogout = () => {
     disconnect();
     logout();
+    addToast('Logged out successfully', 'success');
     navigate('/login');
+    setShowConfirm(false);
   };
 
   return (
@@ -55,12 +61,35 @@ export default function Sidebar() {
             <p className="text-xs text-gray-400 truncate">{user.email}</p>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={() => setShowConfirm(true)}
             className="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition-colors w-full"
           >
             <LogOut size={16} />
             Logout
           </button>
+        </div>
+      )}
+
+      {showConfirm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-80 mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Confirm Logout</h3>
+            <p className="text-sm text-gray-600 mb-5">Are you sure you want to logout?</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </aside>

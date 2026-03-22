@@ -11,7 +11,7 @@ const router = Router();
 router.get('/stats', async (req, res) => {
   try {
     const stats = await configService.getStats(req.userId);
-    const isBrowserRunning = await browserService.isRunning();
+    const isBrowserRunning = await browserService.isRunning(req.userId);
     const searchStatus = searchService.getSearchStatus(req.userId);
     const emailStatus = emailService.getSendStatus(req.userId);
     const dmStatus = dmService.getDMStatus(req.userId);

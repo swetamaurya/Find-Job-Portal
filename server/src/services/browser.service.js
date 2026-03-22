@@ -4,91 +4,114 @@ const path = require('path');
 const config = require('../config');
 const { log, broadcast } = require('../websocket');
 
-let browser = null;
-let mainPage = null;
+// Per-user browser instances: Map<userId, { browser, page }>
+const userBrowsers = new Map();
 
-function cleanProfileLocks() {
+function getProfileDir(userId) {
+  return path.join(config.CHROME_PROFILE_DIR, userId.toString());
+}
+
+function cleanProfileLocks(profileDir) {
   const lockFiles = ['SingletonLock', 'SingletonSocket', 'SingletonCookie'];
   lockFiles.forEach((f) => {
-    const p = path.join(config.CHROME_PROFILE_DIR, f);
+    const p = path.join(profileDir, f);
     try { fs.unlinkSync(p); } catch {}
   });
 }
 
-async function launch() {
+async function launch(userId) {
+  const key = userId.toString();
+  const existing = userBrowsers.get(key);
+
   // Check if existing browser is still alive
-  if (browser) {
+  if (existing && existing.browser) {
     try {
-      const pages = await browser.pages();
+      const pages = await existing.browser.pages();
       if (pages.length > 0) return { success: true, message: 'Browser already running' };
     } catch {
       // Browser dead - force cleanup
     }
-    // Kill stale reference
-    try { await browser.close(); } catch {}
-    browser = null;
-    mainPage = null;
+    try { await existing.browser.close(); } catch {}
+    userBrowsers.delete(key);
+  }
+
+  const profileDir = getProfileDir(userId);
+
+  // Ensure profile dir exists
+  if (!fs.existsSync(profileDir)) {
+    fs.mkdirSync(profileDir, { recursive: true });
   }
 
   // Clean stale lock files from previous crashed sessions
-  cleanProfileLocks();
+  cleanProfileLocks(profileDir);
 
-  log('Launching browser...');
-  browser = await puppeteer.launch({
+  log('Launching browser...', userId);
+  const browser = await puppeteer.launch({
     headless: false,
     defaultViewport: { width: 1366, height: 768 },
     executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1366,768'],
-    userDataDir: config.CHROME_PROFILE_DIR,
+    userDataDir: profileDir,
   });
 
-  mainPage = await browser.newPage();
-  log('Browser launched!');
-  broadcast('browser:launched', {});
+  const page = await browser.newPage();
+  userBrowsers.set(key, { browser, page });
+
+  log('Browser launched!', userId);
+  broadcast('browser:launched', {}, userId);
   return { success: true, message: 'Browser launched' };
 }
 
-async function close() {
-  if (browser) {
-    try { await browser.close(); } catch {}
-    browser = null;
-    mainPage = null;
-    log('Browser closed');
-    broadcast('browser:closed', {});
+async function close(userId) {
+  const key = userId.toString();
+  const entry = userBrowsers.get(key);
+  if (entry && entry.browser) {
+    try { await entry.browser.close(); } catch {}
+    userBrowsers.delete(key);
+    log('Browser closed', userId);
+    broadcast('browser:closed', {}, userId);
   }
   return { success: true };
 }
 
-function getPage() {
-  return mainPage;
+function getPage(userId) {
+  const key = userId.toString();
+  const entry = userBrowsers.get(key);
+  return entry ? entry.page : null;
 }
 
-function getBrowser() {
-  return browser;
+function getBrowser(userId) {
+  const key = userId.toString();
+  const entry = userBrowsers.get(key);
+  return entry ? entry.browser : null;
 }
 
-async function isRunning() {
-  if (!browser) return false;
+async function isRunning(userId) {
+  const key = userId.toString();
+  const entry = userBrowsers.get(key);
+  if (!entry || !entry.browser) return false;
   try {
-    await browser.pages();
+    await entry.browser.pages();
     return true;
   } catch {
-    browser = null;
-    mainPage = null;
+    userBrowsers.delete(key);
     return false;
   }
 }
 
-async function ensurePage() {
-  if (!browser) throw new Error('Browser not launched');
-  if (mainPage) {
+async function ensurePage(userId) {
+  const key = userId.toString();
+  const entry = userBrowsers.get(key);
+  if (!entry || !entry.browser) throw new Error('Browser not launched');
+
+  if (entry.page) {
     try {
-      await mainPage.title();
-      return mainPage;
+      await entry.page.title();
+      return entry.page;
     } catch {}
   }
-  mainPage = await browser.newPage();
-  return mainPage;
+  entry.page = await entry.browser.newPage();
+  return entry.page;
 }
 
 module.exports = { launch, close, getPage, getBrowser, isRunning, ensurePage };

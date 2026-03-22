@@ -1,5 +1,6 @@
 const browserService = require('./browser.service');
 const config = require('../config');
+const configService = require('./config.service');
 const { log, broadcast } = require('../websocket');
 const SentDM = require('../models/SentDM');
 
@@ -74,7 +75,7 @@ async function sendDirectMessage(page, messageButton, message, index, total) {
 
     // Click Message button
     await page.evaluate((btn) => btn.click(), messageButton);
-    await randomSleep(3000, 5000);
+    await randomSleep(2000, 3500);
 
     // Wait for compose to appear
     let composeFound = false;
@@ -135,40 +136,35 @@ async function sendDirectMessage(page, messageButton, message, index, total) {
 
     let typed = false;
 
-    // Strategy 1: CDP DOM.focus + Input.insertText
+    // Strategy 1: CDP DOM.focus + keyboard.type (CDP sets real focus, keyboard.type triggers React events)
     if (!typed) {
       try {
         const client = await page.createCDPSession();
         const { root } = await client.send('DOM.getDocument');
         let nodeId = 0;
-        let matchedSel = '';
-        const selectors = [
+        const cdpSelectors = [
           'div.msg-form__contenteditable div[role="textbox"]',
           'div.msg-form__contenteditable[contenteditable="true"]',
           'div.msg-form__contenteditable',
         ];
-        for (const sel of selectors) {
+        for (const sel of cdpSelectors) {
           try {
             const result = await client.send('DOM.querySelector', { nodeId: root.nodeId, selector: sel });
-            if (result.nodeId) { nodeId = result.nodeId; matchedSel = sel; break; }
+            if (result.nodeId) { nodeId = result.nodeId; break; }
           } catch {}
         }
-        console.log(`[DM-DEBUG] S1: hasSubject=${hasSubject}, nodeId=${nodeId}, sel=${matchedSel}`);
         if (nodeId) {
           await client.send('DOM.focus', { nodeId });
-          await sleep(300);
-          await client.send('Input.insertText', { text: message });
+          await sleep(400);
+          await page.keyboard.type(message, { delay: 15 });
           await sleep(500);
-          const content = await page.evaluate(() => {
+          typed = await page.evaluate(() => {
             const el = document.querySelector('div.msg-form__contenteditable');
-            return el ? el.innerText.trim().substring(0, 40) : 'NOT_FOUND';
+            return el && el.innerText.trim().length > 5;
           });
-          typed = content.length > 5 && content !== 'NOT_FOUND';
-          console.log(`[DM-DEBUG] S1 result: typed=${typed}, content="${content}"`);
         }
         await client.detach();
       } catch (err) {
-        console.log(`[DM-DEBUG] S1 error: ${err.message}`);
       }
     }
 
@@ -179,94 +175,72 @@ async function sendDirectMessage(page, messageButton, message, index, total) {
         await sleep(200);
         await page.keyboard.press('Tab');
         await sleep(600);
-        const afterTab = await page.evaluate(() => {
-          const ae = document.activeElement;
-          return { tag: ae?.tagName, ce: ae?.getAttribute('contenteditable'), cls: (ae?.className || '').substring(0, 60) };
-        });
-        console.log(`[DM-DEBUG] S2: afterTab=`, JSON.stringify(afterTab));
-        await page.keyboard.type(message, { delay: 18 });
+        await page.keyboard.type(message, { delay: 15 });
         await sleep(500);
         typed = await page.evaluate(() => {
           const el = document.querySelector('div.msg-form__contenteditable');
           return el && el.innerText.trim().length > 5;
         });
-        console.log(`[DM-DEBUG] S2 result: typed=${typed}`);
       } catch (err) {
-        console.log(`[DM-DEBUG] S2 error: ${err.message}`);
       }
     }
 
-    // Strategy 3: Click body (overlay removed) + keyboard.type
+    // Strategy 3: Click body + keyboard.type
     if (!typed) {
       try {
         const bodyEl = await page.$('div.msg-form__contenteditable');
-        console.log(`[DM-DEBUG] S3: bodyEl found=${!!bodyEl}`);
         if (bodyEl) {
           await bodyEl.click();
           await sleep(400);
-          const afterClick = await page.evaluate(() => {
-            const ae = document.activeElement;
-            return { tag: ae?.tagName, ce: ae?.getAttribute('contenteditable'), cls: (ae?.className || '').substring(0, 60) };
-          });
-          console.log(`[DM-DEBUG] S3: afterClick=`, JSON.stringify(afterClick));
-          await page.keyboard.type(message, { delay: 18 });
+          await page.keyboard.type(message, { delay: 15 });
           await sleep(500);
           typed = await page.evaluate(() => {
             const el = document.querySelector('div.msg-form__contenteditable');
             return el && el.innerText.trim().length > 5;
           });
-          console.log(`[DM-DEBUG] S3 result: typed=${typed}`);
         }
       } catch (err) {
-        console.log(`[DM-DEBUG] S3 error: ${err.message}`);
       }
     }
 
-    // Strategy 4: Tab navigation to find any contenteditable
+    // Strategy 4: CDP Input.insertText + event dispatch (fallback)
     if (!typed) {
       try {
-        let tabFound = false;
-        for (let t = 0; t < 15; t++) {
-          await page.keyboard.press('Tab');
-          await sleep(200);
-          const onTarget = await page.evaluate(() => {
-            return document.activeElement?.getAttribute('contenteditable') === 'true';
+        const client = await page.createCDPSession();
+        const { root } = await client.send('DOM.getDocument');
+        let nodeId = 0;
+        for (const sel of ['div.msg-form__contenteditable[contenteditable="true"]', 'div.msg-form__contenteditable']) {
+          try {
+            const result = await client.send('DOM.querySelector', { nodeId: root.nodeId, selector: sel });
+            if (result.nodeId) { nodeId = result.nodeId; break; }
+          } catch {}
+        }
+        if (nodeId) {
+          await client.send('DOM.focus', { nodeId });
+          await sleep(300);
+          await client.send('Input.insertText', { text: message });
+          await sleep(300);
+          // Dispatch events so React/LinkedIn recognizes the text and enables Send
+          await page.evaluate(() => {
+            const el = document.querySelector('div.msg-form__contenteditable');
+            if (el) {
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+              el.dispatchEvent(new Event('change', { bubbles: true }));
+              el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText' }));
+              // Also press a space and backspace to trigger React's onChange
+            }
           });
-          if (onTarget) {
-            console.log(`[DM-DEBUG] S4: found contenteditable after ${t + 1} tabs`);
-            await page.keyboard.type(message, { delay: 18 });
-            await sleep(500);
-            typed = await page.evaluate(() => {
-              const el = document.querySelector('div.msg-form__contenteditable');
-              return el && el.innerText.trim().length > 5;
-            });
-            tabFound = true;
-            console.log(`[DM-DEBUG] S4 result: typed=${typed}`);
-            break;
-          }
+          await page.keyboard.press('Space');
+          await page.keyboard.press('Backspace');
+          await sleep(500);
+          typed = await page.evaluate(() => {
+            const el = document.querySelector('div.msg-form__contenteditable');
+            return el && el.innerText.trim().length > 5;
+          });
         }
-        if (!tabFound) console.log(`[DM-DEBUG] S4: no contenteditable found after 15 tabs`);
+        await client.detach();
       } catch (err) {
-        console.log(`[DM-DEBUG] S4 error: ${err.message}`);
       }
-    }
-
-    // Strategy 5: DOM injection with full event simulation
-    if (!typed) {
-      typed = await page.evaluate((msg) => {
-        const target = document.querySelector('div.msg-form__contenteditable div[role="textbox"]')
-          || document.querySelector('div.msg-form__contenteditable');
-        if (target) {
-          target.focus();
-          target.innerHTML = '<p>' + msg.replace(/\n/g, '</p><p>') + '</p>';
-          target.dispatchEvent(new Event('input', { bubbles: true }));
-          target.dispatchEvent(new Event('change', { bubbles: true }));
-          target.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: msg }));
-          return target.innerText.trim().length > 5;
-        }
-        return false;
-      }, message);
-      console.log(`[DM-DEBUG] S5 result: typed=${typed}`);
     }
 
     if (!typed) {
@@ -275,23 +249,42 @@ async function sendDirectMessage(page, messageButton, message, index, total) {
       return { success: false, method: 'dm', reason: 'message_not_typed' };
     }
 
-    // Click Send button
-    await randomSleep(500, 800);
-    let sent = await page.evaluate(() => {
-      const allBtns = document.querySelectorAll('button');
-      for (const btn of allBtns) {
-        const label = (btn.getAttribute('aria-label') || '').toLowerCase();
-        const text = (btn.innerText || '').toLowerCase().trim();
-        if ((label === 'send' || text === 'send') && !btn.disabled && btn.offsetHeight > 0) {
-          btn.click();
-          return true;
+    // Click Send button — wait for it to be enabled first
+    await sleep(800);
+    let sent = false;
+    for (let attempt = 0; attempt < 3 && !sent; attempt++) {
+      if (attempt > 0) await sleep(1000);
+      sent = await page.evaluate(() => {
+        const allBtns = document.querySelectorAll('button');
+        for (const btn of allBtns) {
+          const label = (btn.getAttribute('aria-label') || '').toLowerCase();
+          const text = (btn.innerText || '').toLowerCase().trim();
+          const cls = (btn.className || '').toLowerCase();
+          if ((label === 'send' || text === 'send' || cls.includes('msg-form__send-btn')) && btn.offsetHeight > 0) {
+            if (btn.disabled) return 'disabled';
+            btn.click();
+            return 'clicked';
+          }
         }
-      }
-      return false;
-    });
+        return 'not_found';
+      });
+      sent = sent === 'clicked';
+    }
 
-    if (!sent) { await page.keyboard.press('Enter'); }
+    if (!sent) {
+      // Try submit via keyboard shortcut (Ctrl/Cmd + Enter)
+      await page.keyboard.down('Meta');
+      await page.keyboard.press('Enter');
+      await page.keyboard.up('Meta');
+      await sleep(500);
+    }
     await randomSleep(2000, 3000);
+
+    // Verify compose closed (message was sent)
+    const composeClosed = await page.evaluate(() => {
+      const el = document.querySelector('div.msg-form__contenteditable');
+      return !el || el.offsetHeight === 0 || el.innerText.trim().length < 5;
+    });
 
     // Close overlays
     await page.evaluate(() => {
@@ -480,7 +473,7 @@ async function sendSingleDM(page, profileUrl, message, connectionNote, index, to
 
   return Promise.race([
     dmPromise,
-    sleep(30000).then(() => ({ success: false, method: 'timeout', reason: '30s timeout' })),
+    sleep(60000).then(() => ({ success: false, method: 'timeout', reason: '60s timeout' })),
   ]);
 }
 
@@ -490,10 +483,11 @@ async function sendAllDMs(userId, profiles) {
   state.isSending = true;
   state.shouldStop = false;
 
-  const cfg = await config.loadConfig(userId);
+  // Use getConfig which includes default dmMessage and connectionNote from user profile
+  const cfg = await configService.getConfig(userId);
   let page;
   try {
-    page = await browserService.ensurePage();
+    page = await browserService.ensurePage(userId);
   } catch (err) {
     state.isSending = false;
     log(`DM Error: ${err.message}`, userId);

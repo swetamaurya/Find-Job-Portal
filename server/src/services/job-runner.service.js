@@ -34,12 +34,12 @@ async function runFullPipeline(userId) {
     broadcast('pipeline:started', {}, userId);
     log('Starting full pipeline...', userId);
 
-    await browserService.launch();
+    await browserService.launch(userId);
 
-    const authStatus = await authService.navigateToLinkedIn();
+    const authStatus = await authService.navigateToLinkedIn(userId);
     if (!authStatus.loggedIn) {
       log('Waiting for login...', userId);
-      const loginResult = await authService.waitForLogin(180);
+      const loginResult = await authService.waitForLogin(userId, 180);
       if (!loginResult.loggedIn) {
         throw new Error('Login timeout - please log in and try again');
       }
