@@ -26,7 +26,8 @@
       "WebFetch(domain:leadhootz.com)",
       "WebFetch(domain:gist.github.com)",
       "WebFetch(domain:saleleads.ai)",
-      "WebFetch(domain:www.linkedin.com)"
+      "WebFetch(domain:www.linkedin.com)",
+      "Bash(npm run build:*)"
     ]
   }
 }

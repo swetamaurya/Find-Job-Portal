@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const { auth } = require('./middleware/auth');
 const authRoutes = require('./routes/auth.routes');
@@ -15,7 +16,7 @@ const User = require('./models/User');
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors());
 app.use(express.json());
 
 // Public routes
@@ -65,6 +66,13 @@ app.get('/api/history/dms', auth, async (req, res) => {
   } catch {
     res.json({ dms: [], total: 0, dmCount: 0, connCount: 0 });
   }
+});
+
+// Serve React frontend in production
+const clientDist = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'));
 });
 
 module.exports = app;

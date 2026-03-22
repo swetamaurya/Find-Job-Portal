@@ -46,13 +46,18 @@ async function launch(userId) {
   cleanProfileLocks(profileDir);
 
   log('Launching browser...', userId);
-  const browser = await puppeteer.launch({
-    headless: false,
+  const isProduction = process.env.NODE_ENV === 'production';
+  const launchOptions = {
+    headless: isProduction ? 'new' : false,
     defaultViewport: { width: 1366, height: 768 },
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1366,768'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--window-size=1366,768'],
     userDataDir: profileDir,
-  });
+  };
+  // Use system Chrome on Mac (dev), bundled Chromium on server (prod)
+  if (!isProduction) {
+    launchOptions.executablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  }
+  const browser = await puppeteer.launch(launchOptions);
 
   const page = await browser.newPage();
 
