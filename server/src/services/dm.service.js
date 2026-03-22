@@ -110,11 +110,10 @@ async function sendDirectMessage(page, messageButton, message, index, total) {
 
     await randomSleep(300, 600);
 
-    // Disable the drag-and-drop overlay that blocks mouse clicks on the message body
+    // Remove the drag-and-drop overlay that blocks mouse clicks
     await page.evaluate(() => {
       document.querySelectorAll('[class*="msg-form__attachment-drag"], [class*="attachment-drag-and-drop"]').forEach((el) => {
-        el.style.pointerEvents = 'none';
-        el.style.zIndex = '-1';
+        el.style.display = 'none';
       });
     });
     await sleep(300);
@@ -131,105 +130,143 @@ async function sendDirectMessage(page, messageButton, message, index, total) {
         await sleep(300);
         await page.keyboard.type('Regarding the open role', { delay: 15 });
         await sleep(500);
-        // Tab from Subject to body — natural focus transition
-        await page.keyboard.press('Tab');
-        await sleep(800);
       } catch {}
     }
 
-    // Find the deepest editable element inside the compose box
-    const editableSelector = await page.evaluate(() => {
-      // Try innermost textbox first, then work outward
-      const candidates = [
-        'div.msg-form__contenteditable div[role="textbox"]',
-        'div.msg-form__contenteditable div[contenteditable="true"]',
-        'div.msg-form__contenteditable[contenteditable="true"]',
-        'div[role="textbox"][contenteditable="true"]',
-      ];
-      for (const sel of candidates) {
-        const el = document.querySelector(sel);
-        if (el && el.offsetHeight > 0) return sel;
-      }
-      return null;
-    });
-
     let typed = false;
 
-    // Strategy 1: Click (overlay disabled) + keyboard.type
-    if (!typed && editableSelector) {
+    // Strategy 1: CDP DOM.focus + Input.insertText
+    if (!typed) {
       try {
-        await page.click(editableSelector);
-        await sleep(400);
+        const client = await page.createCDPSession();
+        const { root } = await client.send('DOM.getDocument');
+        let nodeId = 0;
+        let matchedSel = '';
+        const selectors = [
+          'div.msg-form__contenteditable div[role="textbox"]',
+          'div.msg-form__contenteditable[contenteditable="true"]',
+          'div.msg-form__contenteditable',
+        ];
+        for (const sel of selectors) {
+          try {
+            const result = await client.send('DOM.querySelector', { nodeId: root.nodeId, selector: sel });
+            if (result.nodeId) { nodeId = result.nodeId; matchedSel = sel; break; }
+          } catch {}
+        }
+        console.log(`[DM-DEBUG] S1: hasSubject=${hasSubject}, nodeId=${nodeId}, sel=${matchedSel}`);
+        if (nodeId) {
+          await client.send('DOM.focus', { nodeId });
+          await sleep(300);
+          await client.send('Input.insertText', { text: message });
+          await sleep(500);
+          const content = await page.evaluate(() => {
+            const el = document.querySelector('div.msg-form__contenteditable');
+            return el ? el.innerText.trim().substring(0, 40) : 'NOT_FOUND';
+          });
+          typed = content.length > 5 && content !== 'NOT_FOUND';
+          console.log(`[DM-DEBUG] S1 result: typed=${typed}, content="${content}"`);
+        }
+        await client.detach();
+      } catch (err) {
+        console.log(`[DM-DEBUG] S1 error: ${err.message}`);
+      }
+    }
+
+    // Strategy 2: Tab from Subject to body + keyboard.type
+    if (!typed && hasSubject) {
+      try {
+        await page.click('input[placeholder*="Subject"]');
+        await sleep(200);
+        await page.keyboard.press('Tab');
+        await sleep(600);
+        const afterTab = await page.evaluate(() => {
+          const ae = document.activeElement;
+          return { tag: ae?.tagName, ce: ae?.getAttribute('contenteditable'), cls: (ae?.className || '').substring(0, 60) };
+        });
+        console.log(`[DM-DEBUG] S2: afterTab=`, JSON.stringify(afterTab));
         await page.keyboard.type(message, { delay: 18 });
         await sleep(500);
         typed = await page.evaluate(() => {
           const el = document.querySelector('div.msg-form__contenteditable');
           return el && el.innerText.trim().length > 5;
         });
-      } catch {}
+        console.log(`[DM-DEBUG] S2 result: typed=${typed}`);
+      } catch (err) {
+        console.log(`[DM-DEBUG] S2 error: ${err.message}`);
+      }
     }
 
-    // Strategy 2: JS focus + execCommand('insertText')
+    // Strategy 3: Click body (overlay removed) + keyboard.type
     if (!typed) {
-      typed = await page.evaluate((msg, sel) => {
-        const target = sel ? document.querySelector(sel) : document.querySelector('div.msg-form__contenteditable');
-        if (!target) return false;
-        target.focus();
-        target.innerHTML = '';
-        const ok = document.execCommand('insertText', false, msg);
-        return ok && target.innerText.trim().length > 5;
-      }, message, editableSelector);
-      await sleep(300);
-    }
-
-    // Strategy 3: Tab from subject (if subject exists) already done above, now try keyboard
-    if (!typed && hasSubject) {
-      // Focus might already be on body from Tab above
-      await page.keyboard.type(message, { delay: 18 });
-      await sleep(500);
-      typed = await page.evaluate(() => {
-        const el = document.querySelector('div.msg-form__contenteditable');
-        return el && el.innerText.trim().length > 5;
-      });
-    }
-
-    // Strategy 4: JS focus + Range + keyboard.type
-    if (!typed) {
-      await page.evaluate((sel) => {
-        const target = sel ? document.querySelector(sel) : document.querySelector('div.msg-form__contenteditable');
-        if (target) {
-          target.focus();
-          target.innerHTML = '';
-          const range = document.createRange();
-          range.selectNodeContents(target);
-          range.collapse(false);
-          const s = window.getSelection();
-          s.removeAllRanges();
-          s.addRange(range);
+      try {
+        const bodyEl = await page.$('div.msg-form__contenteditable');
+        console.log(`[DM-DEBUG] S3: bodyEl found=${!!bodyEl}`);
+        if (bodyEl) {
+          await bodyEl.click();
+          await sleep(400);
+          const afterClick = await page.evaluate(() => {
+            const ae = document.activeElement;
+            return { tag: ae?.tagName, ce: ae?.getAttribute('contenteditable'), cls: (ae?.className || '').substring(0, 60) };
+          });
+          console.log(`[DM-DEBUG] S3: afterClick=`, JSON.stringify(afterClick));
+          await page.keyboard.type(message, { delay: 18 });
+          await sleep(500);
+          typed = await page.evaluate(() => {
+            const el = document.querySelector('div.msg-form__contenteditable');
+            return el && el.innerText.trim().length > 5;
+          });
+          console.log(`[DM-DEBUG] S3 result: typed=${typed}`);
         }
-      }, editableSelector);
-      await sleep(400);
-      await page.keyboard.type(message, { delay: 18 });
-      await sleep(500);
-      typed = await page.evaluate(() => {
-        const el = document.querySelector('div.msg-form__contenteditable');
-        return el && el.innerText.trim().length > 5;
-      });
+      } catch (err) {
+        console.log(`[DM-DEBUG] S3 error: ${err.message}`);
+      }
     }
 
-    // Strategy 5: DOM injection + input event
+    // Strategy 4: Tab navigation to find any contenteditable
     if (!typed) {
-      typed = await page.evaluate((msg, sel) => {
-        const target = sel ? document.querySelector(sel) : document.querySelector('div.msg-form__contenteditable');
+      try {
+        let tabFound = false;
+        for (let t = 0; t < 15; t++) {
+          await page.keyboard.press('Tab');
+          await sleep(200);
+          const onTarget = await page.evaluate(() => {
+            return document.activeElement?.getAttribute('contenteditable') === 'true';
+          });
+          if (onTarget) {
+            console.log(`[DM-DEBUG] S4: found contenteditable after ${t + 1} tabs`);
+            await page.keyboard.type(message, { delay: 18 });
+            await sleep(500);
+            typed = await page.evaluate(() => {
+              const el = document.querySelector('div.msg-form__contenteditable');
+              return el && el.innerText.trim().length > 5;
+            });
+            tabFound = true;
+            console.log(`[DM-DEBUG] S4 result: typed=${typed}`);
+            break;
+          }
+        }
+        if (!tabFound) console.log(`[DM-DEBUG] S4: no contenteditable found after 15 tabs`);
+      } catch (err) {
+        console.log(`[DM-DEBUG] S4 error: ${err.message}`);
+      }
+    }
+
+    // Strategy 5: DOM injection with full event simulation
+    if (!typed) {
+      typed = await page.evaluate((msg) => {
+        const target = document.querySelector('div.msg-form__contenteditable div[role="textbox"]')
+          || document.querySelector('div.msg-form__contenteditable');
         if (target) {
           target.focus();
           target.innerHTML = '<p>' + msg.replace(/\n/g, '</p><p>') + '</p>';
           target.dispatchEvent(new Event('input', { bubbles: true }));
           target.dispatchEvent(new Event('change', { bubbles: true }));
+          target.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: msg }));
           return target.innerText.trim().length > 5;
         }
         return false;
-      }, message, editableSelector);
+      }, message);
+      console.log(`[DM-DEBUG] S5 result: typed=${typed}`);
     }
 
     if (!typed) {
@@ -420,7 +457,9 @@ async function sendSingleDM(page, profileUrl, message, connectionNote, index, to
         if (messageButton) {
           const dmResult = await sendDirectMessage(page, messageButton, message, index, total);
           if (dmResult.success) return dmResult;
-          if (sendConnectionReq && (dmResult.reason === 'premium_required' || dmResult.reason === 'compose_box_not_found')) {
+          // Fallback to connection request if DM fails for any recoverable reason
+          const fallbackReasons = ['premium_required', 'compose_box_not_found', 'message_not_typed'];
+          if (sendConnectionReq && fallbackReasons.includes(dmResult.reason)) {
             await page.goto(profileUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
             await randomSleep(1500, 2500);
             return await sendConnectionRequest(page, connectionNote, index, total);
@@ -485,7 +524,6 @@ async function sendAllDMs(userId, profiles) {
     const profile = toProcess[i];
 
     broadcast('dm:sending', { index: i, total: toProcess.length, name: profile.posterName, profileUrl: profile.profileUrl }, userId);
-    log(`[DM ${i + 1}/${toProcess.length}] ${profile.posterName || 'Unknown'} (${profile.profileUrl})`, userId);
 
     const result = await sendSingleDM(
       page, profile.profileUrl, cfg.dmMessage || '', cfg.connectionNote || '',
@@ -497,9 +535,10 @@ async function sendAllDMs(userId, profiles) {
       if (result.method === 'connect') connectSent++;
       await saveSentDM(userId, profile.profileUrl, result.method === 'dm' ? 'dm_sent' : 'connected');
       broadcast('dm:sent', { index: i, method: result.method, name: profile.posterName }, userId);
+      log(`[DM ${i + 1}/${toProcess.length}] ${profile.posterName || 'Unknown'} — ${result.method === 'dm' ? 'DM sent' : 'Connection sent'}`, userId);
     } else {
       failed++;
-      log(`  Reason: ${result.reason}`, userId);
+      log(`[DM ${i + 1}/${toProcess.length}] ${profile.posterName || 'Unknown'} — ${result.reason}`, userId);
       await saveSentDM(userId, profile.profileUrl, result.reason || 'failed');
       broadcast('dm:failed', { index: i, reason: result.reason, name: profile.posterName }, userId);
     }

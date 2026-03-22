@@ -197,7 +197,11 @@ async function extractFromPage(tabPage, skipKeywords) {
         ];
         for (const sel of nameSelectors) {
           const nameEl = post.querySelector(sel);
-          if (nameEl && nameEl.innerText.trim()) { posterName = nameEl.innerText.trim(); break; }
+          if (nameEl && nameEl.innerText.trim()) {
+            // LinkedIn duplicates name (visible + screen reader spans), take first line only
+            posterName = nameEl.innerText.trim().split('\n')[0].trim();
+            break;
+          }
         }
 
         let posterHeadline = '';
@@ -210,7 +214,7 @@ async function extractFromPage(tabPage, skipKeywords) {
         for (const sel of headlineSelectors) {
           const headEl = post.querySelector(sel);
           if (headEl && headEl.innerText.trim().length > 3) {
-            posterHeadline = headEl.innerText.trim().toLowerCase();
+            posterHeadline = headEl.innerText.trim().split('\n')[0].trim().toLowerCase();
             break;
           }
         }
