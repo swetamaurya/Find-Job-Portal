@@ -34,13 +34,19 @@ function stopSearch(userId) {
   log('Search stop requested', userId);
 }
 
-async function extractFromPage(tabPage, skipKeywords) {
+async function extractFromPage(tabPage, skipKeywords, maxExp = 5) {
   return tabPage.evaluate(
-    (ignoredDomains, skipKw) => {
+    (ignoredDomains, skipKw, maxExpYears) => {
       const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
       const results = { emails: [], posts: [], profiles: [] };
-      const debug = { totalChunks: 0, tooShort: 0, skippedByKeyword: 0, jobSeekerSkip: 0, expSkip: 0, notJobRelated: 0, noEmails: 0, domainFiltered: 0, passed: 0, totalPosts: 0, postTooShort: 0, postSkipKw: 0, postJobSeeker: 0, postExpSkip: 0, postNotJob: 0, postNoProfile: 0, postNotRelevant: 0, postPassed: 0 };
+      const debug = { totalChunks: 0, tooShort: 0, skippedByKeyword: 0, jobSeekerSkip: 0, expSkip: 0, notJobRelated: 0, noEmails: 0, domainFiltered: 0, passed: 0, totalPosts: 0, postTooShort: 0, postSkipKw: 0, postJobSeeker: 0, postExpSkip: 0, postNotJob: 0, postNoProfile: 0, postNotRelevant: 0, postPassed: 0, rawEmailsOnPage: 0, rawEmailsList: [] };
       const fullPageText = document.body.innerText || '';
+
+      // Scan ALL emails on the page before any filtering
+      const allRawEmails = fullPageText.match(emailRegex) || [];
+      const uniqueRaw = [...new Set(allRawEmails.map(e => e.toLowerCase()))];
+      debug.rawEmailsOnPage = uniqueRaw.length;
+      debug.rawEmailsList = uniqueRaw.slice(0, 30); // cap at 30 for logging
 
       const jobKeywords = [
         'hiring', 'we are hiring', "we're hiring", 'urgently hiring',
@@ -70,7 +76,7 @@ async function extractFromPage(tabPage, skipKeywords) {
             const num2 = match[2] ? parseInt(match[2]) : num1;
             const minExp = Math.min(num1, num2);
             const maxExp = Math.max(num1, num2);
-            if (minExp <= 4 && maxExp >= 0) return true;
+            if (minExp <= maxExpYears && maxExp >= 0) return true;
             dominated = true;
           }
         }
@@ -263,7 +269,8 @@ async function extractFromPage(tabPage, skipKeywords) {
       return results;
     },
     IGNORED_DOMAINS,
-    skipKeywords
+    skipKeywords,
+    maxExp
   );
 }
 
@@ -406,12 +413,17 @@ async function searchOneQuery(tabPage, query, cfg, state, userId) {
 
   let extracted;
   try {
-    extracted = await extractFromPage(tabPage, cfg.skipKeywords || []);
+    extracted = await extractFromPage(tabPage, cfg.skipKeywords || [], cfg.maxExperience || 5);
   } catch {
     extracted = { emails: [], posts: [], profiles: [] };
   }
 
   if (extracted._debug) {
+    const d = extracted._debug;
+    log(`[Debug] Raw emails on page: ${d.rawEmailsOnPage} → ${d.rawEmailsList.join(', ') || 'none'}`, userId);
+    log(`[Debug] Chunks: ${d.totalChunks} (tooShort:${d.tooShort} skipKw:${d.skippedByKeyword} jobSeeker:${d.jobSeekerSkip} exp:${d.expSkip} notJob:${d.notJobRelated} domainFiltered:${d.domainFiltered} passed:${d.passed})`, userId);
+    log(`[Debug] Posts: ${d.totalPosts} (tooShort:${d.postTooShort} skipKw:${d.postSkipKw} jobSeeker:${d.postJobSeeker} exp:${d.postExpSkip} notJob:${d.postNotJob} noProfile:${d.postNoProfile} notRelevant:${d.postNotRelevant} passed:${d.postPassed})`, userId);
+    log(`[Debug] Result: ${extracted.emails.length} emails, ${extracted.posts.length} posts, ${(extracted.profiles || []).length} profiles`, userId);
     delete extracted._debug;
   }
 
@@ -489,6 +501,10 @@ async function startSearch(userId) {
       const result = await searchOneQuery(currentPage, queries[q], cfg, state, userId);
 
       const validExtracted = result.emails.filter((e) => isValidEmail(e.email));
+      const invalidEmails = result.emails.filter((e) => !isValidEmail(e.email));
+      if (invalidEmails.length > 0) {
+        log(`[Debug] Rejected ${invalidEmails.length} invalid emails: ${invalidEmails.map(e => e.email).join(', ')}`, userId);
+      }
       validExtracted.forEach((e) => {
         if (!allEmails.has(e.email)) {
           allEmails.set(e.email, e);

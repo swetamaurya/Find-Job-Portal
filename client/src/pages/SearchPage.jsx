@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Play, Square, Plus, X, MapPin, Search, Filter, SlidersHorizontal } from 'lucide-react';
+import { Play, Square, Plus, X, MapPin, Search, Filter, SlidersHorizontal, RefreshCw } from 'lucide-react';
 import api from '../lib/api';
 import ProgressBar from '../components/common/ProgressBar';
 import LiveLog from '../components/common/LiveLog';
@@ -88,9 +88,14 @@ export default function SearchPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Search size={22} className="text-blue-600" /> LinkedIn Search
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Search size={22} className="text-blue-600" /> LinkedIn Search
+          </h2>
+          <button onClick={() => api.get('/config').then((r) => setConfig(r.data)).catch(() => {})} className="flex items-center gap-1 text-gray-500 hover:text-gray-900 text-sm px-2 py-1.5">
+            <RefreshCw size={14} />
+          </button>
+        </div>
         {!searchProgress.running ? (
           <button onClick={startSearch} className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm">
             <Play size={16} /> Start Search
@@ -139,11 +144,11 @@ export default function SearchPage() {
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
             {[
               { label: 'Emails', value: searchProgress.totalEmails || 0, bg: 'bg-blue-50', text: 'text-blue-700', sub: 'text-blue-500' },
-              { label: 'New', value: searchProgress.newEmails || 0, bg: 'bg-green-50', text: 'text-green-700', sub: 'text-green-500' },
+              { label: 'New Emails', value: searchProgress.newEmails || 0, bg: 'bg-green-50', text: 'text-green-700', sub: 'text-green-500' },
               { label: 'Already Sent', value: searchProgress.alreadySentEmails || 0, bg: 'bg-gray-50', text: 'text-gray-700', sub: 'text-gray-500' },
               { label: 'Posts', value: searchProgress.totalPosts || 0, bg: 'bg-orange-50', text: 'text-orange-700', sub: 'text-orange-500' },
               { label: 'Profiles', value: searchProgress.totalProfiles || 0, bg: 'bg-purple-50', text: 'text-purple-700', sub: 'text-purple-500' },
-              { label: 'New', value: searchProgress.newProfiles || 0, bg: 'bg-green-50', text: 'text-green-700', sub: 'text-green-500' },
+              { label: 'New Profiles', value: searchProgress.newProfiles || 0, bg: 'bg-green-50', text: 'text-green-700', sub: 'text-green-500' },
               { label: 'Already DMed', value: searchProgress.alreadyDMedProfiles || 0, bg: 'bg-gray-50', text: 'text-gray-700', sub: 'text-gray-500' },
             ].map((s, i) => (
               <div key={i} className={`${s.bg} rounded-lg p-3 text-center`}>
@@ -214,7 +219,7 @@ export default function SearchPage() {
         <h3 className="font-semibold text-gray-800 text-sm flex items-center gap-2 mb-4">
           <SlidersHorizontal size={16} className="text-gray-500" /> Search Filters
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {/* Date Filter */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">Date Filter</label>
@@ -229,6 +234,12 @@ export default function SearchPage() {
           <div>
             <label className="block text-sm text-gray-600 mb-1">Scroll Count — <strong>{config.scrollCount}</strong></label>
             <input type="range" min="5" max="50" value={config.scrollCount} onChange={(e) => saveConfig({ scrollCount: parseInt(e.target.value) })} className="w-full mt-1" />
+          </div>
+
+          {/* Max Experience */}
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Max Experience — <strong>{config.maxExperience || 5} yrs</strong></label>
+            <input type="range" min="1" max="15" value={config.maxExperience || 5} onChange={(e) => saveConfig({ maxExperience: parseInt(e.target.value) })} className="w-full mt-1" />
           </div>
 
           {/* Location Toggle */}

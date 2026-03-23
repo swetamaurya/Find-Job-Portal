@@ -46,4 +46,48 @@ router.post('/run-pipeline', async (req, res) => {
   }
 });
 
+router.post('/send-all', async (req, res) => {
+  try {
+    const { log } = require('../websocket');
+    const ExtractedResult = require('../models/ExtractedResult');
+
+    if (emailService.getSendStatus(req.userId).isSending) throw new Error('Emails are already being sent');
+    if (dmService.getDMStatus(req.userId).isSending) throw new Error('DMs are already being sent');
+
+    const data = await ExtractedResult.findOne({ userId: req.userId }).lean();
+    if (!data) return res.status(400).json({ error: 'No extracted data. Run search first.' });
+
+    const emails = data.emails || [];
+    const allProfiles = [...(data.profiles || [])];
+    (data.emails || []).forEach((e) => {
+      if (e.profileUrl && !allProfiles.some((p) => p.profileUrl === e.profileUrl)) {
+        allProfiles.push({ profileUrl: e.profileUrl, posterName: e.posterName || '' });
+      }
+    });
+
+    res.json({ success: true, message: `Sending ${emails.length} emails + ${allProfiles.length} DMs` });
+
+    // Send emails first, then DMs
+    try {
+      if (emails.length > 0) {
+        log('Starting emails...', req.userId);
+        await emailService.sendEmails(req.userId, emails);
+      }
+    } catch (e) {
+      log(`Email error: ${e.message}`, req.userId);
+    }
+
+    try {
+      if (allProfiles.length > 0) {
+        log('Starting DMs...', req.userId);
+        await dmService.sendAllDMs(req.userId, allProfiles);
+      }
+    } catch (e) {
+      log(`DM error: ${e.message}`, req.userId);
+    }
+  } catch (err) {
+    res.status(409).json({ error: err.message });
+  }
+});
+
 module.exports = router;

@@ -4,6 +4,7 @@ import { useStore } from '../store';
 
 export function useWebSocket() {
   const addLog = useStore((s) => s.addLog);
+  const addToast = useStore((s) => s.addToast);
   const setSearchProgress = useStore((s) => s.setSearchProgress);
   const setEmailProgress = useStore((s) => s.setEmailProgress);
   const setDMProgress = useStore((s) => s.setDMProgress);
@@ -35,19 +36,25 @@ export function useWebSocket() {
         newEmails: msg.newEmails, alreadySentEmails: msg.alreadySentEmails,
         newProfiles: msg.newProfiles, alreadyDMedProfiles: msg.alreadyDMedProfiles,
       }));
-      if (msg.type === 'search:complete') setSearchProgress({
-        running: false, totalEmails: msg.totalEmails, totalProfiles: msg.totalProfiles,
-        newEmails: msg.newEmails, alreadySentEmails: msg.alreadySentEmails,
-        newProfiles: msg.newProfiles, alreadyDMedProfiles: msg.alreadyDMedProfiles,
-        totalPosts: msg.totalPosts, completed: true,
-      });
+      if (msg.type === 'search:complete') {
+        setSearchProgress({
+          running: false, totalEmails: msg.totalEmails, totalProfiles: msg.totalProfiles,
+          newEmails: msg.newEmails, alreadySentEmails: msg.alreadySentEmails,
+          newProfiles: msg.newProfiles, alreadyDMedProfiles: msg.alreadyDMedProfiles,
+          totalPosts: msg.totalPosts, completed: true,
+        });
+        addToast(`Search complete! ${msg.newEmails || 0} new emails, ${msg.newProfiles || 0} new profiles`, 'success');
+      }
 
       // Email events
       if (msg.type === 'email:started') setEmailProgress({ running: true, current: 0, total: msg.total, sent: 0, failed: 0 });
       if (msg.type === 'email:sending') setEmailProgress((prev) => ({ ...prev, current: msg.index, currentEmail: msg.email }));
       if (msg.type === 'email:sent') setEmailProgress((prev) => ({ ...prev, sent: (prev.sent || 0) + 1 }));
       if (msg.type === 'email:failed') setEmailProgress((prev) => ({ ...prev, failed: (prev.failed || 0) + 1 }));
-      if (msg.type === 'email:complete') setEmailProgress({ running: false, sent: msg.sent, failed: msg.failed });
+      if (msg.type === 'email:complete') {
+        setEmailProgress({ running: false, sent: msg.sent, failed: msg.failed });
+        addToast(`Emails done! Sent: ${msg.sent}, Failed: ${msg.failed}`, msg.failed > 0 ? 'error' : 'success');
+      }
 
       // DM events
       if (msg.type === 'dm:started') setDMProgress({ running: true, current: 0, total: msg.total, dmSent: 0, connectSent: 0, failed: 0 });
@@ -58,7 +65,10 @@ export function useWebSocket() {
         connectSent: msg.method === 'connect' ? (prev.connectSent || 0) + 1 : prev.connectSent || 0,
       }));
       if (msg.type === 'dm:failed') setDMProgress((prev) => ({ ...prev, failed: (prev.failed || 0) + 1 }));
-      if (msg.type === 'dm:complete') setDMProgress({ running: false, dmSent: msg.dmSent, connectSent: msg.connectSent, failed: msg.failed });
+      if (msg.type === 'dm:complete') {
+        setDMProgress({ running: false, dmSent: msg.dmSent, connectSent: msg.connectSent, failed: msg.failed });
+        addToast(`DMs done! DMs: ${msg.dmSent}, Connections: ${msg.connectSent}, Failed: ${msg.failed}`, msg.failed > 0 ? 'error' : 'success');
+      }
     });
-  }, [addLog, setSearchProgress, setEmailProgress, setDMProgress, setBrowserStatus]);
+  }, [addLog, addToast, setSearchProgress, setEmailProgress, setDMProgress, setBrowserStatus]);
 }

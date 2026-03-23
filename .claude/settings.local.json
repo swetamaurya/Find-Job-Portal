@@ -27,7 +27,10 @@
       "WebFetch(domain:gist.github.com)",
       "WebFetch(domain:saleleads.ai)",
       "WebFetch(domain:www.linkedin.com)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nsupport separate frontend/backend deployment\n\n- API URL configurable via VITE_API_URL env var\n- WebSocket connects to backend URL when deployed separately  \n- CORS allows vercel.app and onrender.com origins\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)"
     ]
   }
 }

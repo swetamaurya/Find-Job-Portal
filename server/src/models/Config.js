@@ -8,6 +8,7 @@ const configSchema = new mongoose.Schema({
   locationFilter: Boolean,
   geoIds: [String],
   scrollCount: Number,
+  maxExperience: { type: Number, default: 5 },
   extractComments: Boolean,
   searchGoogle: Boolean,
   emailDelay: Number,

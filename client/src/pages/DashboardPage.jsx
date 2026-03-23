@@ -94,6 +94,15 @@ export default function DashboardPage() {
     }
   };
 
+  const sendAll = async () => {
+    try {
+      const r = await api.post('/dashboard/send-all');
+      addToast(r.data.message || 'Sending emails + DMs...', 'info');
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Failed to start', 'error');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -104,15 +113,14 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <StatCard icon={Mail} label="Total Emails Found" value={stats.totalEmails || 0} color="blue" />
-        <StatCard icon={Mail} label="New (Unsent)" value={Math.max(0, (stats.totalEmails || 0) - (stats.sentEmailsCount || 0))} color="orange" />
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <StatCard icon={Mail} label="Emails Found" value={stats.totalEmails || 0} color="blue" />
         <StatCard icon={Send} label="Emails Sent" value={stats.sentEmailsCount || 0} color="green" />
         <StatCard icon={MessageSquare} label="DMs Sent" value={stats.dmSentCount || 0} color="purple" />
         <StatCard icon={UserPlus} label="Connections Sent" value={stats.connectSentCount || 0} color="blue" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <button
           onClick={browserStatus === 'stopped' ? launchBrowser : runPipeline}
           disabled={loading || searchProgress.running || emailProgress.running}
@@ -125,11 +133,18 @@ export default function DashboardPage() {
           )}
         </button>
         <button
+          onClick={sendAll}
+          disabled={emailProgress.running || dmProgress.running}
+          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-3 sm:px-6 sm:py-4 font-medium transition-colors text-sm sm:text-base"
+        >
+          <Send size={18} /> Send Emails + DMs
+        </button>
+        <button
           onClick={sendUnsent}
           disabled={emailProgress.running}
           className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-3 sm:px-6 sm:py-4 font-medium transition-colors text-sm sm:text-base"
         >
-          <Send size={18} /> Send Unsent Emails
+          <Send size={18} /> Send Emails Only
         </button>
         <button
           onClick={closeBrowser}
