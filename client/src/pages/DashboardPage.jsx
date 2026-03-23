@@ -113,8 +113,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard icon={Mail} label="Emails Found" value={stats.totalEmails || 0} color="blue" />
+      <div className="grid grid-cols-3 gap-3">
         <StatCard icon={Send} label="Emails Sent" value={stats.sentEmailsCount || 0} color="green" />
         <StatCard icon={MessageSquare} label="DMs Sent" value={stats.dmSentCount || 0} color="purple" />
         <StatCard icon={UserPlus} label="Connections Sent" value={stats.connectSentCount || 0} color="blue" />
