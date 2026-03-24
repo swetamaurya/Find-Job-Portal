@@ -43,4 +43,11 @@ export const useStore = create((set) => ({
     set((s) => ({
       dmProgress: typeof update === 'function' ? update(s.dmProgress) : { ...s.dmProgress, ...update },
     })),
+
+  // Naukri progress
+  naukriProgress: { running: false },
+  setNaukriProgress: (update) =>
+    set((s) => ({
+      naukriProgress: typeof update === 'function' ? update(s.naukriProgress) : { ...s.naukriProgress, ...update },
+    })),
 }));

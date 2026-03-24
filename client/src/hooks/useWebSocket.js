@@ -8,6 +8,7 @@ export function useWebSocket() {
   const setSearchProgress = useStore((s) => s.setSearchProgress);
   const setEmailProgress = useStore((s) => s.setEmailProgress);
   const setDMProgress = useStore((s) => s.setDMProgress);
+  const setNaukriProgress = useStore((s) => s.setNaukriProgress);
   const setBrowserStatus = useStore((s) => s.setBrowserStatus);
 
   useEffect(() => {
@@ -69,6 +70,18 @@ export function useWebSocket() {
         setDMProgress({ running: false, dmSent: msg.dmSent, connectSent: msg.connectSent, failed: msg.failed });
         addToast(`DMs done! DMs: ${msg.dmSent}, Connections: ${msg.connectSent}, Failed: ${msg.failed}`, msg.failed > 0 ? 'error' : 'success');
       }
+      // Naukri events
+      if (msg.type === 'naukri:search:started') setNaukriProgress({ running: true, phase: 'searching', totalFound: 0, applied: 0, failed: 0, skipped: 0 });
+      if (msg.type === 'naukri:login-required') addToast('Naukri login required! Browser mein login karo.', 'error');
+      if (msg.type === 'naukri:job:found') setNaukriProgress((prev) => ({ ...prev, totalFound: msg.totalFound, lastJob: msg.title }));
+      if (msg.type === 'naukri:apply:started') setNaukriProgress((prev) => ({ ...prev, phase: 'applying', current: msg.index, total: msg.total, currentJob: msg.title, currentCompany: msg.company }));
+      if (msg.type === 'naukri:apply:success') setNaukriProgress((prev) => ({ ...prev, applied: msg.applied, failed: msg.failed, skipped: msg.skipped }));
+      if (msg.type === 'naukri:apply:skipped') setNaukriProgress((prev) => ({ ...prev, skipped: (prev.skipped || 0) + 1 }));
+      if (msg.type === 'naukri:apply:failed') setNaukriProgress((prev) => ({ ...prev, failed: (prev.failed || 0) + 1 }));
+      if (msg.type === 'naukri:complete') {
+        setNaukriProgress({ running: false, completed: true, applied: msg.applied, failed: msg.failed, skipped: msg.skipped, totalFound: msg.totalFound });
+        addToast(`Naukri done! Applied: ${msg.applied}, Failed: ${msg.failed}, Skipped: ${msg.skipped}`, 'success');
+      }
     });
-  }, [addLog, addToast, setSearchProgress, setEmailProgress, setDMProgress, setBrowserStatus]);
+  }, [addLog, addToast, setSearchProgress, setEmailProgress, setDMProgress, setNaukriProgress, setBrowserStatus]);
 }

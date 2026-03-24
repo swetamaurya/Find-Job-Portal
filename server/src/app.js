@@ -9,6 +9,7 @@ const configRoutes = require('./routes/config.routes');
 const searchRoutes = require('./routes/search.routes');
 const emailsRoutes = require('./routes/emails.routes');
 const dmsRoutes = require('./routes/dms.routes');
+const naukriRoutes = require('./routes/naukri.routes');
 
 const SentEmail = require('./models/SentEmail');
 const SentDM = require('./models/SentDM');
@@ -43,6 +44,7 @@ app.use('/api/config', auth, configRoutes);
 app.use('/api', auth, searchRoutes);
 app.use('/api/emails', auth, emailsRoutes);
 app.use('/api/dms', auth, dmsRoutes);
+app.use('/api/naukri', auth, naukriRoutes);
 
 // Users list (protected)
 app.get('/api/users', auth, async (req, res) => {

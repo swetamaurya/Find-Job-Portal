@@ -10,6 +10,7 @@ import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage';
 import LoginPage from './pages/LoginPage';
 import UsersPage from './pages/UsersPage';
+import NaukriPage from './pages/NaukriPage';
 
 function ProtectedRoute({ children }) {
   const token = useAuthStore((s) => s.token);
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/emails" element={<EmailsPage />} />
         <Route path="/dms" element={<DMsPage />} />
+        <Route path="/naukri" element={<NaukriPage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/users" element={<UsersPage />} />

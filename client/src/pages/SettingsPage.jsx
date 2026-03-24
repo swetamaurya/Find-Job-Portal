@@ -106,7 +106,40 @@ export default function SettingsPage() {
     try {
       const r = await api.post('/config/resume', formData);
       if (r.data.filename) setConfig((prev) => ({ ...prev, resumeFilename: r.data.filename }));
-      addToast(`Resume uploaded: ${r.data.filename}`);
+
+      // Auto-fill profile from extracted resume data
+      if (r.data.extracted && Object.keys(r.data.extracted).length > 0) {
+        const ext = r.data.extracted;
+        setProfile((prev) => ({
+          role: ext.role || prev.role || '',
+          experience: ext.experience || prev.experience || '',
+          skills: ext.skills || prev.skills || '',
+          phone: ext.phone || prev.phone || '',
+          linkedinUrl: ext.linkedinUrl || prev.linkedinUrl || '',
+          githubUrl: ext.githubUrl || prev.githubUrl || '',
+          portfolioUrl: ext.portfolioUrl || prev.portfolioUrl || '',
+        }));
+        if (ext.name) setCredentials((prev) => ({ ...prev, senderName: ext.name || prev.senderName }));
+
+        // Auto-save profile to backend
+        const profileData = {
+          role: ext.role || '',
+          experience: ext.experience || '',
+          skills: ext.skills || '',
+          phone: ext.phone || '',
+          linkedinUrl: ext.linkedinUrl || '',
+          githubUrl: ext.githubUrl || '',
+          portfolioUrl: ext.portfolioUrl || '',
+        };
+        await api.post('/config/profile', profileData);
+        if (ext.name) await api.post('/config/credentials', { senderName: ext.name });
+
+        const filled = Object.keys(ext).filter((k) => ext[k]).join(', ');
+        addToast(`Resume uploaded! Auto-filled: ${filled}`);
+        setOpenSection('profile');
+      } else {
+        addToast(`Resume uploaded: ${r.data.filename}`);
+      }
     } catch (err) {
       addToast(err.response?.data?.error || 'Resume upload failed', 'error');
     }

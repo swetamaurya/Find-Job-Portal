@@ -24,6 +24,13 @@ const configSchema = new mongoose.Schema({
   emailTemplateMode: { type: String, enum: ['structured', 'custom'], default: 'structured' },
   emailTemplateHtml: { type: String, default: '' },
   emailTemplateText: { type: String, default: '' },
+  // Naukri config
+  naukriKeywords: [String],
+  naukriLocations: [String],
+  naukriMinExp: { type: Number, default: 0 },
+  naukriMaxExp: { type: Number, default: 5 },
+  naukriMinSalary: { type: Number, default: 0 },
+  naukriMaxApply: { type: Number, default: 20 },
 }, { strict: false, collection: 'configs' });
 
 configSchema.index({ userId: 1 }, { unique: true });
