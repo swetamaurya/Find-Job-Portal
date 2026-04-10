@@ -10,6 +10,7 @@ const searchRoutes = require('./routes/search.routes');
 const emailsRoutes = require('./routes/emails.routes');
 const dmsRoutes = require('./routes/dms.routes');
 const naukriRoutes = require('./routes/naukri.routes');
+const resumeRoutes = require('./routes/resume.routes');
 
 const SentEmail = require('./models/SentEmail');
 const SentDM = require('./models/SentDM');
@@ -45,6 +46,7 @@ app.use('/api', auth, searchRoutes);
 app.use('/api/emails', auth, emailsRoutes);
 app.use('/api/dms', auth, dmsRoutes);
 app.use('/api/naukri', auth, naukriRoutes);
+app.use('/api/resume', auth, resumeRoutes);
 
 // Users list (protected)
 app.get('/api/users', auth, async (req, res) => {
@@ -86,7 +88,7 @@ app.get('/api/history/dms', auth, async (req, res) => {
 });
 
 // Serve React frontend in production
-const clientDist = path.join(__dirname, '../../client/dist');
+const clientDist = path.join(__dirname, '../../Frontend/dist');
 app.use(express.static(clientDist));
 app.get('*', (req, res) => {
   res.sendFile(path.join(clientDist, 'index.html'));

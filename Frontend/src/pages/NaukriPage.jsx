@@ -85,7 +85,6 @@ export default function NaukriPage() {
       if (browserStatus === 'stopped') {
         addToast('Launching browser...', 'info');
         await api.post('/browser/launch');
-        await api.post('/browser/navigate');
       }
       const r = await api.post('/naukri/search/start');
       addToast(r.data.message || 'Naukri search started', 'info');

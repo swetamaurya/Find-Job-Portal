@@ -1,6 +1,6 @@
 /**
  * Migration script: Tags all existing data with a default "Tarun Kumar" user.
- * Run once: node server/src/scripts/migrate-to-multiuser.js
+ * Run once: node Backend/src/scripts/migrate-to-multiuser.js
  */
 const path = require('path');
 const fs = require('fs');

@@ -32,7 +32,15 @@
       "Bash(git commit -m \"$\\(cat <<''EOF''\nsupport separate frontend/backend deployment\n\n- API URL configurable via VITE_API_URL env var\n- WebSocket connects to backend URL when deployed separately  \n- CORS allows vercel.app and onrender.com origins\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git push:*)",
       "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWJmMDZmOTc1MDQxZDI1ZmFiZDJiYjIiLCJpYXQiOjE3NzQzMzk5MjEsImV4cCI6MTc3NjkzMTkyMX0.Xm1lNJp1JborTMqWgpHckNOcWXc7qfSWy_FzeIyG6CY\")",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(git checkout:*)",
+      "Bash(du:*)",
+      "Bash(npm run install:all:*)",
+      "Bash(npm run dev:*)",
+      "Bash(NODE_PATH=./node_modules node:*)",
+      "Bash(NODE_PATH=\"/Users/swetamaurya/Desktop/All/Find job code/Backend/node_modules\" node:*)",
+      "Bash(tee:*)",
+      "Bash(NODE_PATH=\"/Users/swetamaurya/Desktop/All/Find job code/Backend/node_modules\" node -e \"\nconst mongoose = require\\(''mongoose''\\);\nconst URI = ''mongodb+srv://tarunmehto71_db_user:jobemail@storeemailjob.y7diiv1.mongodb.net/StoreEmailJob?appName=StoreEmailJob'';\nconst SWETA_ID = ''69bf088c8441db87e67cad9a'';\n\\(async \\(\\) => {\n  await mongoose.connect\\(URI\\);\n  const db = mongoose.connection.db;\n  const newPass = ''dlje ifuk ypju qjng'';\n  const r = await db.collection\\(''users''\\).updateOne\\(\n    { _id: new mongoose.Types.ObjectId\\(SWETA_ID\\) },\n    { $set: { gmailAppPassword: newPass } }\n  \\);\n  console.log\\(''Update result:'', r.modifiedCount\\);\n  const u = await db.collection\\(''users''\\).findOne\\({ _id: new mongoose.Types.ObjectId\\(SWETA_ID\\) }\\);\n  console.log\\(''Sender:'', u.senderEmail, ''| App password set:'', !!u.gmailAppPassword\\);\n  await mongoose.disconnect\\(\\);\n}\\)\\(\\).catch\\(e => { console.error\\(e\\); process.exit\\(1\\); }\\);\n\")"
     ]
   }
 }

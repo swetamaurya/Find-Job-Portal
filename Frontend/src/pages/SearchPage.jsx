@@ -12,6 +12,7 @@ const CITIES = [
   { name: 'Bengaluru', geoId: '105214831' },
   { name: 'Pune', geoId: '103671728' },
   { name: 'Mumbai', geoId: '106164952' },
+  { name: 'Remote', geoId: 'remote' },
 ];
 
 export default function SearchPage() {

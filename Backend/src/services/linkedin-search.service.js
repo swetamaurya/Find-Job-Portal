@@ -348,10 +348,13 @@ async function extractPageProfiles(tabPage) {
 
 async function searchOneQuery(tabPage, query, cfg, state, userId) {
   const dateParam = `&datePosted=%22${cfg.dateFilter}%22`;
-  const locationParam = cfg.locationFilter
-    ? `&authorGeoRegion=%5B${cfg.geoIds.map((id) => `%22${id}%22`).join('%2C')}%5D`
+  const geoIds = (cfg.geoIds || []).filter((id) => id !== 'remote');
+  const hasRemote = (cfg.geoIds || []).includes('remote');
+  const locationParam = cfg.locationFilter && geoIds.length > 0
+    ? `&authorGeoRegion=%5B${geoIds.map((id) => `%22${id}%22`).join('%2C')}%5D`
     : '';
-  const searchUrl = `https://www.linkedin.com/search/results/content/?keywords=${encodeURIComponent(query)}&origin=GLOBAL_SEARCH_HEADER${dateParam}${locationParam}&sortBy=%22date_posted%22`;
+  const searchQuery = hasRemote ? `${query} remote` : query;
+  const searchUrl = `https://www.linkedin.com/search/results/content/?keywords=${encodeURIComponent(searchQuery)}&origin=GLOBAL_SEARCH_HEADER${dateParam}${locationParam}&sortBy=%22date_posted%22`;
 
   try {
     await tabPage.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });

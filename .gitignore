@@ -2,7 +2,7 @@ node_modules/
 .env
 chrome-temp-profile/
 .claude/
-server/uploads/
+Backend/uploads/
 uploads/
 .DS_Store
 dist/

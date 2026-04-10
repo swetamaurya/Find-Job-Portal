@@ -50,7 +50,7 @@ async function launch(userId) {
   const launchOptions = {
     headless: isProduction ? 'new' : false,
     defaultViewport: { width: 1366, height: 768 },
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--window-size=1366,768'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--window-size=1366,768', '--disable-session-crashed-bubble', '--no-restore-state'],
     userDataDir: profileDir,
   };
   // Use system Chrome on Mac (dev), bundled Chromium on server (prod)
@@ -59,7 +59,13 @@ async function launch(userId) {
   }
   const browser = await puppeteer.launch(launchOptions);
 
-  const page = await browser.newPage();
+  // Close any restored tabs from previous session, keep only one blank page
+  const existingPages = await browser.pages();
+  const page = existingPages[0] || await browser.newPage();
+  for (let i = 1; i < existingPages.length; i++) {
+    try { await existingPages[i].close(); } catch {}
+  }
+  try { await page.goto('about:blank'); } catch {}
 
   // Dismiss any Chrome error dialogs (e.g. "Something went wrong when opening your profile")
   page.on('dialog', async (dialog) => {

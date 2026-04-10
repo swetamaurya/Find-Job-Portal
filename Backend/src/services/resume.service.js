@@ -1,130 +1,7 @@
-const { Router } = require('express');
-const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
-const configService = require('../services/config.service');
-const emailService = require('../services/email-send.service');
 const config = require('../config');
 const User = require('../models/User');
-
-const router = Router();
-
-const upload = multer({
-  dest: config.UPLOADS_DIR,
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') cb(null, true);
-    else cb(new Error('Only PDF files allowed'));
-  },
-});
-
-router.get('/', async (req, res) => {
-  try {
-    const cfg = await configService.getConfig(req.userId);
-    res.json(cfg);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.put('/', async (req, res) => {
-  try {
-    const updated = await configService.updateConfig(req.userId, req.body);
-    res.json(updated);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.post('/credentials', async (req, res) => {
-  try {
-    await configService.updateCredentials(req.userId, req.body);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.post('/profile', async (req, res) => {
-  try {
-    await configService.updateProfile(req.userId, req.body);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.post('/test-email', async (req, res) => {
-  try {
-    const result = await emailService.testConnection(req.userId);
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.post('/resume', upload.single('resume'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-
-  const userDir = path.join(config.UPLOADS_DIR, req.userId.toString());
-  if (!fs.existsSync(userDir)) fs.mkdirSync(userDir, { recursive: true });
-
-  // Delete old resume if exists
-  const user = await User.findById(req.userId);
-  if (user?.resumeFilename) {
-    const oldPath = path.join(userDir, user.resumeFilename);
-    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-  }
-
-  const newPath = path.join(userDir, req.file.originalname);
-  fs.renameSync(req.file.path, newPath);
-
-  await User.findByIdAndUpdate(req.userId, { resumeFilename: req.file.originalname });
-
-  // Parse PDF and auto-fill profile
-  let extracted = {};
-  try {
-    const { PDFParse, VerbosityLevel } = require('pdf-parse');
-    const pdfBuffer = fs.readFileSync(newPath);
-    const uint8 = new Uint8Array(pdfBuffer);
-    const parser = new PDFParse(uint8, { verbosity: VerbosityLevel.ERRORS });
-    await parser.load();
-    const result = await parser.getText();
-    const text = result.pages.map((pg) => pg.text).join('\n');
-
-    // Extract URLs from raw PDF (hyperlinks not in visible text)
-    const rawStr = pdfBuffer.toString('latin1');
-    const pdfUrls = [];
-    const uriRegex = /\/URI\s*\(([^)]+)\)/g;
-    let uriMatch;
-    while ((uriMatch = uriRegex.exec(rawStr)) !== null) pdfUrls.push(uriMatch[1]);
-
-    extracted = extractProfileFromResume(text, pdfUrls);
-
-    // Update profile with extracted data
-    const currentProfile = user?.profile || {};
-    const updates = {};
-    if (extracted.role) updates.role = extracted.role;
-    if (extracted.experience) updates.experience = extracted.experience;
-    if (extracted.skills) updates.skills = extracted.skills;
-    if (extracted.phone) updates.phone = extracted.phone;
-    if (extracted.linkedinUrl) updates.linkedinUrl = extracted.linkedinUrl;
-    if (extracted.githubUrl) updates.githubUrl = extracted.githubUrl;
-    if (extracted.portfolioUrl) updates.portfolioUrl = extracted.portfolioUrl;
-
-    if (Object.keys(updates).length > 0) {
-      const mergedProfile = { ...currentProfile, ...updates };
-      await User.findByIdAndUpdate(req.userId, { profile: mergedProfile });
-    }
-
-    if (extracted.name) {
-      await User.findByIdAndUpdate(req.userId, { senderName: extracted.name });
-    }
-  } catch (parseErr) {
-    console.error('Resume parse error:', parseErr.message);
-  }
-
-  res.json({ success: true, filename: req.file.originalname, extracted });
-});
 
 function extractProfileFromResume(text, pdfUrls = []) {
   const result = {};
@@ -205,7 +82,7 @@ function extractProfileFromResume(text, pdfUrls = []) {
   if (expMatch) {
     result.experience = expMatch[0].trim();
   } else {
-    // Calculate from work date ranges (e.g. "Mar 2024 – Mar 2025", "Oct 2023 – Present")
+    // Calculate from work date ranges
     const months = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
     const dateRangeRegex = /(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*\s*\d{4}\s*[-–—]\s*(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*\s*\d{4}|present)/gi;
     const ranges = text.match(dateRangeRegex) || [];
@@ -255,35 +132,76 @@ function extractProfileFromResume(text, pdfUrls = []) {
   return result;
 }
 
-// Serve resume PDF for preview
-router.get('/resume', async (req, res) => {
-  try {
-    const user = await User.findById(req.userId).lean();
-    if (!user?.resumeFilename) return res.status(404).json({ error: 'No resume uploaded' });
+async function uploadResume(userId, file) {
+  const userDir = path.join(config.UPLOADS_DIR, userId.toString());
+  if (!fs.existsSync(userDir)) fs.mkdirSync(userDir, { recursive: true });
 
-    const filePath = path.join(config.UPLOADS_DIR, req.userId.toString(), user.resumeFilename);
-    if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Resume file not found' });
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename="${user.resumeFilename}"`);
-    fs.createReadStream(filePath).pipe(res);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  // Delete old resume if exists
+  const user = await User.findById(userId);
+  if (user?.resumeFilename) {
+    const oldPath = path.join(userDir, user.resumeFilename);
+    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
   }
-});
 
-// Preview email template
-router.get('/email-preview', async (req, res) => {
+  const newPath = path.join(userDir, file.originalname);
+  fs.renameSync(file.path, newPath);
+
+  await User.findByIdAndUpdate(userId, { resumeFilename: file.originalname });
+
+  // Parse PDF and auto-fill profile
+  let extracted = {};
   try {
-    const User = require('../models/User');
-    const user = await User.findById(req.userId).lean();
-    const cfg = await config.loadConfig(req.userId);
-    const html = emailService.generateEmailHTML(user, cfg);
-    const text = emailService.generateEmailText(user, cfg);
-    res.json({ html, text });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    const { PDFParse, VerbosityLevel } = require('pdf-parse');
+    const pdfBuffer = fs.readFileSync(newPath);
+    const uint8 = new Uint8Array(pdfBuffer);
+    const parser = new PDFParse(uint8, { verbosity: VerbosityLevel.ERRORS });
+    await parser.load();
+    const result = await parser.getText();
+    const text = result.pages.map((pg) => pg.text).join('\n');
 
-module.exports = router;
+    // Extract URLs from raw PDF (hyperlinks not in visible text)
+    const rawStr = pdfBuffer.toString('latin1');
+    const pdfUrls = [];
+    const uriRegex = /\/URI\s*\(([^)]+)\)/g;
+    let uriMatch;
+    while ((uriMatch = uriRegex.exec(rawStr)) !== null) pdfUrls.push(uriMatch[1]);
+
+    extracted = extractProfileFromResume(text, pdfUrls);
+
+    // Update profile with extracted data
+    const currentProfile = user?.profile || {};
+    const updates = {};
+    if (extracted.role) updates.role = extracted.role;
+    if (extracted.experience) updates.experience = extracted.experience;
+    if (extracted.skills) updates.skills = extracted.skills;
+    if (extracted.phone) updates.phone = extracted.phone;
+    if (extracted.linkedinUrl) updates.linkedinUrl = extracted.linkedinUrl;
+    if (extracted.githubUrl) updates.githubUrl = extracted.githubUrl;
+    if (extracted.portfolioUrl) updates.portfolioUrl = extracted.portfolioUrl;
+
+    if (Object.keys(updates).length > 0) {
+      const mergedProfile = { ...currentProfile, ...updates };
+      await User.findByIdAndUpdate(userId, { profile: mergedProfile });
+    }
+
+    if (extracted.name) {
+      await User.findByIdAndUpdate(userId, { senderName: extracted.name });
+    }
+  } catch (parseErr) {
+    console.error('Resume parse error:', parseErr.message);
+  }
+
+  return { filename: file.originalname, extracted };
+}
+
+async function getResume(userId) {
+  const user = await User.findById(userId).lean();
+  if (!user?.resumeFilename) return null;
+
+  const filePath = path.join(config.UPLOADS_DIR, userId.toString(), user.resumeFilename);
+  if (!fs.existsSync(filePath)) return null;
+
+  return { filePath, filename: user.resumeFilename };
+}
+
+module.exports = { extractProfileFromResume, uploadResume, getResume };

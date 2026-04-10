@@ -1,0 +1,543 @@
+Sending from: Sweta Maurya <swetamaurya2019@gmail.com>
+Tarun total sent: 1206
+Sweta already sent: 426
+To send: 801
+Gmail connection verified!
+
+Resume attached: Sweta_Resume.pdf
+
+Subject: Node.js Backend Developer
+Starting to send 801 emails...
+
+[1/801] SENT: gopip@upwardiq.com (total sent: 1)
+[2/801] SENT: goutham@zytheratalent.com (total sent: 2)
+[3/801] SENT: gramesh@datamaxis.net (total sent: 3)
+[4/801] SENT: gregoryscott@rylemglobal.com (total sent: 4)
+[5/801] SENT: gursimran.kaur@programming.com (total sent: 5)
+[6/801] SENT: guru@ivega.com.au (total sent: 6)
+[7/801] SENT: hamza@optimageeks.com (total sent: 7)
+[8/801] SENT: hari.daile@americanstemstaffing.com (total sent: 8)
+[9/801] SENT: harika.pattapu@dprsolutionsinc.com (total sent: 9)
+[10/801] SENT: harish.g@nityainc.com (total sent: 10)
+[11/801] SENT: hr@evrenai.com (total sent: 11)
+[12/801] SENT: hr@exec.zonixtec.com (total sent: 12)
+[13/801] SENT: hr@farmershoptechindia.com (total sent: 13)
+[14/801] SENT: hr@finovo.tech (total sent: 14)
+[15/801] SENT: hr@floqpumps.com (total sent: 15)
+[16/801] SENT: hr@fnamarketingsolutions.com (total sent: 16)
+[17/801] SENT: hr@gdsoftwares.com (total sent: 17)
+[18/801] SENT: hr@geeky.dev (total sent: 18)
+[19/801] SENT: hr@gnxsolutions.in (total sent: 19)
+[20/801] SENT: hr@goldeninfotech.com.bd (total sent: 20)
+[21/801] SENT: hr@hochtechnology.com (total sent: 21)
+[22/801] SENT: hr@infosparkles.com (total sent: 22)
+[23/801] SENT: hr@infowebusa.com (total sent: 23)
+[24/801] SENT: hr@inmatt.com (total sent: 24)
+[25/801] SENT: hr@intentic.co.in (total sent: 25)
+[26/801] SENT: hr@intugratic.com (total sent: 26)
+[27/801] SENT: hr@inventam.com (total sent: 27)
+[28/801] SENT: hr@isummation.com (total sent: 28)
+[29/801] SENT: hr@jaisoftware.net (total sent: 29)
+[30/801] SENT: hr@jfstechnologies.com (total sent: 30)
+[31/801] SENT: hr@lrconsultancy.in (total sent: 31)
+[32/801] SENT: hr@markomind.com (total sent: 32)
+[33/801] SENT: hr@matlabinfotech.com (total sent: 33)
+[34/801] SENT: hr@medcapsky.com (total sent: 34)
+[35/801] SENT: hr@metasysglobal.com (total sent: 35)
+[36/801] SENT: hr@mindcys.com (total sent: 36)
+[37/801] SENT: hr@mobikasa.com (total sent: 37)
+[38/801] SENT: hr@monospear.com (total sent: 38)
+[39/801] SENT: hr@moontechnolabs.com (total sent: 39)
+[40/801] SENT: hr@neogencode.com (total sent: 40)
+[41/801] SENT: hr@nestsoft.com (total sent: 41)
+[42/801] SENT: hr@nevkasystems.com (total sent: 42)
+[43/801] SENT: hr@nextbigtechnology.com (total sent: 43)
+[44/801] SENT: hr@nexteir.com (total sent: 44)
+[45/801] SENT: hr@nextmoveindia.in (total sent: 45)
+[46/801] SENT: hr@pinesucceed.com (total sent: 46)
+[47/801] SENT: hr@piquota.com (total sent: 47)
+[48/801] SENT: hr@pmdgtech.com (total sent: 48)
+[49/801] SENT: hr@prconsulting.in (total sent: 49)
+[50/801] SENT: hr@projostech.com (total sent: 50)
+[51/801] SENT: hr@propvivo.com (total sent: 51)
+[52/801] SENT: hr@pulsesparkle.com (total sent: 52)
+[53/801] SENT: hr@pyngyn.com (total sent: 53)
+[54/801] SENT: hr@raspberry.com.np (total sent: 54)
+[55/801] SENT: hr@realsecure.ae (total sent: 55)
+[56/801] SENT: hr@redappletech.com (total sent: 56)
+[57/801] SENT: hr@relisofttechnologies.com (total sent: 57)
+[58/801] SENT: hr@rsdfl.co.in (total sent: 58)
+[59/801] SENT: hr@safenetin.net (total sent: 59)
+[60/801] SENT: hr@shipfinex.com (total sent: 60)
+[61/801] SENT: hr@shipzee.tech (total sent: 61)
+[62/801] SENT: hr@skandatech.com (total sent: 62)
+[63/801] SENT: hr@skygatecloud.com (total sent: 63)
+[64/801] SENT: hr@skyitsolution.co.in (total sent: 64)
+[65/801] SENT: hr@smtlabs.io (total sent: 65)
+[66/801] SENT: hr@studyix.com (total sent: 66)
+[67/801] SENT: hr@sudhakamalitsolutions.com (total sent: 67)
+[68/801] SENT: hr@sunlitconsultants.com (total sent: 68)
+[69/801] SENT: hr@suntelglobal.net (total sent: 69)
+[70/801] SENT: hr@swordedgecommercials.com (total sent: 70)
+[71/801] SENT: hr@sybrant.com (total sent: 71)
+[72/801] SENT: hr@techmavesoftware.com (total sent: 72)
+[73/801] SENT: hr@tensorik.in (total sent: 73)
+[74/801] SENT: hr@theallwaysroadways.com (total sent: 74)
+[75/801] SENT: hr@thehexatown.com (total sent: 75)
+[76/801] SENT: hr@themaddex.com (total sent: 76)
+[77/801] SENT: hr@tissatech.com (total sent: 77)
+[78/801] SENT: hr@titustreetechnologies.com (total sent: 78)
+[79/801] SENT: hr@trbitix.com (total sent: 79)
+[80/801] SENT: hr@triitans.com (total sent: 80)
+[81/801] SENT: hr@unikbrushes.com (total sent: 81)
+[82/801] SENT: hr@vattanacbrewery.com (total sent: 82)
+[83/801] SENT: hr@vedaitech.com (total sent: 83)
+[84/801] SENT: hr@veritos.in (total sent: 84)
+[85/801] SENT: hr@visionitetech.com (total sent: 85)
+[86/801] SENT: hr@vrdesignsolutions.com (total sent: 86)
+[87/801] SENT: hr@vscubetech.com (total sent: 87)
+[88/801] SENT: hr@webconvoy.com (total sent: 88)
+[89/801] SENT: hr@weya.ai (total sent: 89)
+[90/801] SENT: hr@workbridgetech.com (total sent: 90)
+[91/801] SENT: hr@zippydigitalsolutions.in (total sent: 91)
+[92/801] SENT: hr@zozoconnect.com (total sent: 92)
+[93/801] SENT: hrawat@vyzeinc.com (total sent: 93)
+[94/801] SENT: hrd@chrismerchants.com (total sent: 94)
+[95/801] SENT: hrd@devtechnosys.com (total sent: 95)
+[96/801] SENT: hrd@eminenthrsolutions.com (total sent: 96)
+[97/801] SENT: hrd@fusioncodes.in (total sent: 97)
+[98/801] SENT: hrfreelance75@gmail.com (total sent: 98)
+[99/801] SENT: hrindia@mminfinityservices.in (total sent: 99)
+[100/801] SENT: hrm@ahkerjobs.com (total sent: 100)
+[101/801] SENT: hrmanager@getjoblist.com (total sent: 101)
+[102/801] SENT: hrmanager@humanitics.com (total sent: 102)
+[103/801] SENT: hrofficial@acoreithub.com (total sent: 103)
+[104/801] SENT: hrservice@tantranovatechnology.com (total sent: 104)
+[105/801] SENT: hrsupport@admobs.in (total sent: 105)
+[106/801] SENT: hrteam@intefai.com (total sent: 106)
+[107/801] SENT: hrtechlead@techleadrcm.com (total sent: 107)
+[108/801] SENT: hrzone03@gmail.com (total sent: 108)
+[109/801] SENT: humanresource@tosssolution.com (total sent: 109)
+[110/801] SENT: humanresources@skillfortinstitute.com (total sent: 110)
+[111/801] SENT: huong.nguyen@dikshatek.vn (total sent: 111)
+[112/801] SENT: huyen.mai@ev-search.com (total sent: 112)
+[113/801] SENT: ifeoluwa.recruit1@gmail.com (total sent: 113)
+[114/801] SENT: impactignitionteam@gmail.com (total sent: 114)
+[115/801] SENT: info.sharjahro@gmail.com (total sent: 115)
+[116/801] Retry: info@adamimpex.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c6491157sm12888094a12.9 - gsmtp
+[116/801] FAILED: info@adamimpex.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35ddb973ffasm14418898a91.2 - gsmtp
+[117/801] Retry: info@adskysolution.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2a488caa2sm52711945ad.14 - gsmtp
+[117/801] FAILED: info@adskysolution.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b261b6sm19223269b3a.3 - gsmtp
+[118/801] Retry: info@algoleap.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2b118f84csm5370525ad.58 - gsmtp
+[118/801] FAILED: info@algoleap.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27472d20bsm157086395ad.16 - gsmtp
+[119/801] Retry: info@amerck.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c9cbdfsm20648214b3a.53 - gsmtp
+[119/801] FAILED: info@amerck.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de66b4808sm6243603a91.2 - gsmtp
+[120/801] Retry: info@aroliya.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749a4091sm161814165ad.64 - gsmtp
+[120/801] FAILED: info@aroliya.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b3ccc8sm20194419b3a.19 - gsmtp
+[121/801] Retry: info@bncglobal.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c6b80dsm19234180b3a.42 - gsmtp
+[121/801] FAILED: info@bncglobal.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dd368f538sm22888587a91.14 - gsmtp
+[122/801] Retry: info@careersbridges.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c65a3f08sm14346153a12.31 - gsmtp
+[122/801] FAILED: info@careersbridges.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b76c0fsm15152142b3a.15 - gsmtp
+[123/801] Retry: info@chennaijobstoday.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de4feefaesm6234635a91.0 - gsmtp
+[123/801] FAILED: info@chennaijobstoday.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27478945asm208125985ad.28 - gsmtp
+[124/801] Retry: info@cloudaxistech.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c65812f4sm14434969a12.25 - gsmtp
+[124/801] FAILED: info@cloudaxistech.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c41bc6sm16367065b3a.29 - gsmtp
+[125/801] Retry: info@codedecoders.io - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27472d54bsm152764465ad.1 - gsmtp
+[125/801] FAILED: info@codedecoders.io - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dbe937925sm26797984a91.12 - gsmtp
+[126/801] Retry: info@codenefsolutions.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2747341a8sm159017655ad.3 - gsmtp
+[126/801] FAILED: info@codenefsolutions.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dd35fa93asm19654836a91.8 - gsmtp
+[127/801] Retry: info@codesmania.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b27064sm20079020b3a.9 - gsmtp
+[127/801] FAILED: info@codesmania.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cdc61sm158457275ad.80 - gsmtp
+[128/801] Retry: info@emai.kz - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c6ad8asm16218196b3a.40 - gsmtp
+[128/801] FAILED: info@emai.kz - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c6475ae9sm14245241a12.2 - gsmtp
+[129/801] Retry: info@gauranitaitech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27472d54bsm152789965ad.1 - gsmtp
+[129/801] FAILED: info@gauranitaitech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dd35f7229sm16760112a91.7 - gsmtp
+[130/801] Retry: info@goldvault.app - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cbce2sm156297665ad.79 - gsmtp
+[130/801] FAILED: info@goldvault.app - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749a3a0fsm209673775ad.59 - gsmtp
+[131/801] Retry: info@i-techstack.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2747af6e7sm160656195ad.37 - gsmtp
+[131/801] FAILED: info@i-techstack.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de4feefaesm6239114a91.0 - gsmtp
+[132/801] Retry: info@iboson.io - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2a488caa2sm52873465ad.14 - gsmtp
+[132/801] FAILED: info@iboson.io - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749794e8sm166310405ad.53 - gsmtp
+[133/801] Retry: info@innovalqtechnologies.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b5fb22sm20191708b3a.26 - gsmtp
+[133/801] FAILED: info@innovalqtechnologies.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27477a13dsm158763205ad.26 - gsmtp
+[134/801] Retry: info@isosmena.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c9cbdfsm20666261b3a.53 - gsmtp
+[134/801] FAILED: info@isosmena.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27475bc2asm162887035ad.19 - gsmtp
+[135/801] Retry: info@it-guy.tech - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c68273sm19945363b3a.41 - gsmtp
+[135/801] FAILED: info@it-guy.tech - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27472d1a2sm168309835ad.7 - gsmtp
+[136/801] Retry: info@manektech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c9cbdfsm20668654b3a.53 - gsmtp
+[136/801] FAILED: info@manektech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c4126bsm15736321b3a.36 - gsmtp
+[137/801] Retry: info@myvaliant.com.my - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de66b4808sm6251822a91.2 - gsmtp
+[137/801] FAILED: info@myvaliant.com.my - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c3ce13sm16743222b3a.38 - gsmtp
+[138/801] Retry: info@nessfitech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c657dfb7sm13810918a12.24 - gsmtp
+[138/801] FAILED: info@nessfitech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9ca14b3sm18382083b3a.54 - gsmtp
+[139/801] Retry: info@rangatechnologies.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749794e8sm166357365ad.53 - gsmtp
+[139/801] FAILED: info@rangatechnologies.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cbce2sm156374925ad.79 - gsmtp
+[140/801] Retry: info@sergiecode.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c6476119sm15953616a12.4 - gsmtp
+[140/801] FAILED: info@sergiecode.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c41225sm16943050b3a.28 - gsmtp
+[141/801] Retry: info@shivconsulting.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749e2e97sm207444445ad.82 - gsmtp
+[141/801] FAILED: info@shivconsulting.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cbcafsm158002875ad.77 - gsmtp
+[142/801] Retry: info@site4people.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b274979d5csm155525105ad.38 - gsmtp
+[142/801] FAILED: info@site4people.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27478945asm208306485ad.28 - gsmtp
+[143/801] Retry: info@tagoes.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c6561fe9sm13794287a12.15 - gsmtp
+[143/801] FAILED: info@tagoes.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de5348b35sm4373299a91.6 - gsmtp
+[144/801] Retry: info@tecai.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c6563ce5sm14346155a12.21 - gsmtp
+[144/801] FAILED: info@tecai.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c41bc6sm16382964b3a.29 - gsmtp
+[145/801] Retry: info@technoaspire.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749793b9sm158602005ad.48 - gsmtp
+[145/801] FAILED: info@technoaspire.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749eeb9esm195356975ad.84 - gsmtp
+[146/801] Retry: info@techstackindia.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c6561fe9sm13796796a12.15 - gsmtp
+[146/801] FAILED: info@techstackindia.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c6c2b4sm16076114b3a.46 - gsmtp
+[147/801] Retry: info@thefcubeevents.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dd367bfb1sm15748552a91.10 - gsmtp
+[147/801] FAILED: info@thefcubeevents.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c71e62sm15300862b3a.44 - gsmtp
+[148/801] Retry: info@vidyahelp.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27472d5e5sm192908555ad.15 - gsmtp
+[148/801] FAILED: info@vidyahelp.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c6491fe0sm12941613a12.11 - gsmtp
+[149/801] Retry: info@vscubetech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cbcafsm158068685ad.77 - gsmtp
+[149/801] FAILED: info@vscubetech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27478b658sm168170655ad.31 - gsmtp
+[150/801] Retry: interns@vln.gg - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27475ff56sm156863795ad.22 - gsmtp
+[150/801] FAILED: interns@vln.gg - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b589b8sm15912919b3a.24 - gsmtp
+[151/801] Retry: internships@zentixstack.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27497af31sm154636945ad.52 - gsmtp
+[151/801] FAILED: internships@zentixstack.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749b2423sm206696775ad.67 - gsmtp
+[152/801] Retry: ipsita@cygnuspro.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b2714dsm19880185b3a.1 - gsmtp
+[152/801] FAILED: ipsita@cygnuspro.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c9ba21sm21484627b3a.51 - gsmtp
+[153/801] Retry: ishaka.lodha@techmetworks.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dd35f52c8sm14800505a91.5 - gsmtp
+[153/801] FAILED: ishaka.lodha@techmetworks.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b5fb22sm20212404b3a.26 - gsmtp
+[154/801] Retry: it-jobs@aaabed.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b274979d72sm152212685ad.51 - gsmtp
+[154/801] FAILED: it-jobs@aaabed.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76cffd9611sm11589587a12.17 - gsmtp
+[155/801] Retry: jack@lor-venk.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cbce2sm156488945ad.79 - gsmtp
+[155/801] FAILED: jack@lor-venk.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de500c42fsm6339581a91.0 - gsmtp
+[156/801] Retry: jacqueline.dimperio@cybercodersnetwork.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b274f8867csm163131475ad.54 - gsmtp
+[156/801] FAILED: jacqueline.dimperio@cybercodersnetwork.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b274979530sm154673865ad.46 - gsmtp
+[157/801] Retry: jadhav.nandini@hankersystems.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2747530e4sm163477415ad.18 - gsmtp
+[157/801] FAILED: jadhav.nandini@hankersystems.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749ce29esm168983675ad.81 - gsmtp
+[158/801] Retry: jagadesh.c@iensure.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dbe9379f3sm20906733a91.9 - gsmtp
+[158/801] FAILED: jagadesh.c@iensure.in - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dbe623754sm20722004a91.6 - gsmtp
+[159/801] Retry: jaimin@gracehire.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b2443dsm20039269b3a.4 - gsmtp
+[159/801] FAILED: jaimin@gracehire.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749b66aasm164398015ad.68 - gsmtp
+[160/801] Retry: jakeer@absoluting.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dd36a1d04sm20497103a91.17 - gsmtp
+[160/801] FAILED: jakeer@absoluting.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749ecbd1sm236979295ad.83 - gsmtp
+[161/801] Retry: jakeeravaakruthi@gmail.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cbca2sm155304735ad.73 - gsmtp
+[161/801] FAILED: jakeeravaakruthi@gmail.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c647792bsm15299517a12.6 - gsmtp
+[162/801] Retry: janani@proconnxt.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c3d439sm16927345b3a.35 - gsmtp
+[162/801] FAILED: janani@proconnxt.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b261b6sm19271216b3a.3 - gsmtp
+[163/801] Retry: jane.low@atomicgroup.my - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cbcafsm158174525ad.77 - gsmtp
+[163/801] FAILED: jane.low@atomicgroup.my - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dbe623754sm20726529a91.6 - gsmtp
+[164/801] Retry: janelle.villanueva@ascendion.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b274979500sm211730955ad.44 - gsmtp
+[164/801] FAILED: janelle.villanueva@ascendion.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c6fdd7sm16161260b3a.48 - gsmtp
+[165/801] Retry: janhvi@talentams.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27497af0dsm153168475ad.47 - gsmtp
+[165/801] FAILED: janhvi@talentams.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c6f0c3sm16081816b3a.43 - gsmtp
+[166/801] Retry: jarred@wearelatte.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76c6562018sm14464082a12.18 - gsmtp
+[166/801] FAILED: jarred@wearelatte.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b2714dsm19893652b3a.1 - gsmtp
+[167/801] Retry: jaya.rajak@covetus.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dd35f52c8sm14810851a91.5 - gsmtp
+[167/801] FAILED: jaya.rajak@covetus.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c9ba21sm21500494b3a.51 - gsmtp
+[168/801] Retry: jbhatia@forcecraver.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cbcafsm158215275ad.77 - gsmtp
+[168/801] FAILED: jbhatia@forcecraver.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c9ba21sm21501702b3a.51 - gsmtp
+[169/801] Retry: jeff.sieranki@trshires.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27475bc2asm163140105ad.19 - gsmtp
+[169/801] FAILED: jeff.sieranki@trshires.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dbe62f5dbsm21021580a91.8 - gsmtp
+[170/801] Retry: jefreen.m@cortexconsultants.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de697b0c9sm4476332a91.7 - gsmtp
+[170/801] FAILED: jefreen.m@cortexconsultants.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27472d1a2sm168583535ad.7 - gsmtp
+[171/801] Retry: jenishia.p@senjatec.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749a4791sm156927055ad.66 - gsmtp
+[171/801] FAILED: jenishia.p@senjatec.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27472ddd0sm164507315ad.4 - gsmtp
+[172/801] Retry: jennifer@lor-venk.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749794e8sm166596235ad.53 - gsmtp
+[172/801] FAILED: jennifer@lor-venk.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c76d2684b75sm11180047a12.14 - gsmtp
+[173/801] Retry: jf.escariz@tribu-esk.me - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dbe937925sm26860075a91.12 - gsmtp
+[173/801] FAILED: jf.escariz@tribu-esk.me - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de4feefaesm6261273a91.0 - gsmtp
+[174/801] Retry: jiaxin.lim@atomicgroup.my - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b27064sm20126586b3a.9 - gsmtp
+[174/801] FAILED: jiaxin.lim@atomicgroup.my - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9b21c92sm17219335b3a.11 - gsmtp
+[175/801] Retry: jibin.joseph@gvrinfotek.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82d11f76c09sm11868812b3a.55 - gsmtp
+[175/801] FAILED: jibin.joseph@gvrinfotek.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dbe959358sm19732058a91.13 - gsmtp
+[176/801] Retry: jiratcha@getlinks.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b27497af26sm161908365ad.49 - gsmtp
+[176/801] FAILED: jiratcha@getlinks.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2b118f84csm5803155ad.58 - gsmtp
+[177/801] Retry: jismi.joy@hashroot.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c41a2asm17070918b3a.37 - gsmtp
+[177/801] FAILED: jismi.joy@hashroot.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82d11cd2ce2sm14898722b3a.6 - gsmtp
+[178/801] Retry: jitendra.kumar@tanishasystems.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2ae05991bsm12245915ad.70 - gsmtp
+[178/801] FAILED: jitendra.kumar@tanishasystems.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de4ff7c91sm4521447a91.0 - gsmtp
+[179/801] Retry: jitendrakumar.pareek@celebaltech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c6c2b4sm16098555b3a.46 - gsmtp
+[179/801] FAILED: jitendrakumar.pareek@celebaltech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c6ba2fsm16324796b3a.45 - gsmtp
+[180/801] Retry: jll.hiringteam@zohomail.eu - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749cada2sm154125935ad.71 - gsmtp
+[180/801] FAILED: jll.hiringteam@zohomail.eu - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2749b66aasm164625245ad.68 - gsmtp
+[181/801] Retry: joan.sim@allstaffinc.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2ae05991bsm12266245ad.70 - gsmtp
+[181/801] FAILED: joan.sim@allstaffinc.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dbe937925sm26871770a91.12 - gsmtp
+[182/801] Retry: job@monikasaleta.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-82cf9c41b8dsm15081229b3a.34 - gsmtp
+[182/801] FAILED: job@monikasaleta.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35dd367c142sm15833203a91.11 - gsmtp
+[183/801] Retry: job@tvktechs.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de6818b20sm5768552a91.5 - gsmtp
+[183/801] FAILED: job@tvktechs.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 98e67ed59e1d1-35de51d5847sm6038831a91.2 - gsmtp
+[184/801] Retry: jobs-tvm@penieltech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2ae05991bsm12284375ad.70 - gsmtp
+[184/801] FAILED: jobs-tvm@penieltech.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b2747a7115sm148939325ad.36 - gsmtp
+[185/801] Retry: jobs.bfs1@valuelabs.com - Data command failed: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail
+550-5.4.5 sending limits go to
+550 5.4.5  https://support.google.com/a/answer/166852 d9443c01a7336-2b274979525sm193149475ad.45 - gsmtp

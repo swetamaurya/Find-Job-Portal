@@ -181,9 +181,21 @@ async function startSearch(userId) {
     const browser = browserService.getBrowser(userId);
     if (!browser) throw new Error('Browser not launched. Launch browser first.');
 
-    // Open new tab for Naukri
+    // Open Naukri tab and close any blank pages
     const naukriPage = await browser.newPage();
     state.naukriPage = naukriPage;
+    await naukriPage.bringToFront();
+
+    // Close blank/empty pages so user only sees Naukri
+    const allPages = await browser.pages();
+    for (const p of allPages) {
+      if (p !== naukriPage) {
+        const url = p.url();
+        if (url === 'about:blank' || url === 'chrome://newtab/' || url === 'chrome://new-tab-page/') {
+          try { await p.close(); } catch {}
+        }
+      }
+    }
 
     // Check Naukri login
     log('Checking Naukri login...', userId);
@@ -192,14 +204,34 @@ async function startSearch(userId) {
     } catch {}
     await randomSleep(2000, 3000);
 
-    const currentUrl = naukriPage.url();
+    let currentUrl = naukriPage.url();
     if (currentUrl.includes('/nlogin') || currentUrl.includes('/login') || currentUrl.includes('about:blank')) {
-      log('Naukri login required! Please log in via the browser window.', userId);
+      log('Naukri login required! Please log in via the browser window. Waiting 2 minutes...', userId);
       broadcast('naukri:login-required', {}, userId);
-      broadcast('naukri:complete', { applied: 0, failed: 0, skipped: 0, totalFound: 0 }, userId);
-      try { await naukriPage.close(); } catch {}
-      state.naukriPage = null;
-      return;
+
+      // Wait for user to login (check every 5 seconds for 2 minutes)
+      let loggedIn = false;
+      for (let i = 0; i < 24; i++) {
+        if (state.shouldStop) break;
+        await sleep(5000);
+        try {
+          currentUrl = naukriPage.url();
+          if (!currentUrl.includes('/nlogin') && !currentUrl.includes('/login') && !currentUrl.includes('about:blank') && currentUrl.includes('naukri.com')) {
+            loggedIn = true;
+            break;
+          }
+        } catch { break; }
+      }
+
+      if (!loggedIn) {
+        log('Naukri login timeout. Please log in and try again.', userId);
+        broadcast('naukri:complete', { applied: 0, failed: 0, skipped: 0, totalFound: 0 }, userId);
+        try { await naukriPage.close(); } catch {}
+        state.naukriPage = null;
+        return;
+      }
+      log('Naukri login detected!', userId);
+      await randomSleep(1000, 2000);
     }
 
     log('Naukri logged in!', userId);
