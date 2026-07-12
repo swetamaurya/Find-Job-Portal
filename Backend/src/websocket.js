@@ -69,6 +69,18 @@ function broadcast(type, data, userId) {
   });
 }
 
+// Returns a Set of userId strings that currently have a live WebSocket connection.
+function getOnlineUserIds() {
+  const online = new Set();
+  if (!wss) return online;
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1 && client.userId) {
+      online.add(client.userId.toString());
+    }
+  });
+  return online;
+}
+
 function log(message, userId) {
   const time = new Date().toLocaleTimeString('en-IN');
   const formatted = `[${time}] ${message}`;
@@ -76,4 +88,4 @@ function log(message, userId) {
   broadcast('log', { message: formatted }, userId);
 }
 
-module.exports = { init, broadcast, log };
+module.exports = { init, broadcast, log, getOnlineUserIds };

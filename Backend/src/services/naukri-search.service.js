@@ -34,18 +34,22 @@ function stopSearch(userId) {
 }
 
 async function getNaukriStats(userId) {
-  const total = await NaukriJob.countDocuments({ userId });
-  const applied = await NaukriJob.countDocuments({ userId, status: 'applied' });
-  const failed = await NaukriJob.countDocuments({ userId, status: 'failed' });
-  const skipped = await NaukriJob.countDocuments({ userId, status: { $in: ['skipped', 'external'] } });
+  const [total, applied, failed, skipped] = await Promise.all([
+    NaukriJob.countDocuments({ userId }),
+    NaukriJob.countDocuments({ userId, status: 'applied' }),
+    NaukriJob.countDocuments({ userId, status: 'failed' }),
+    NaukriJob.countDocuments({ userId, status: { $in: ['skipped', 'external'] } }),
+  ]);
   return { total, applied, failed, skipped };
 }
 
 async function getJobs(userId, { status, page = 1, limit = 50 } = {}) {
   const query = { userId };
   if (status) query.status = status;
-  const jobs = await NaukriJob.find(query).sort({ foundAt: -1 }).skip((page - 1) * limit).limit(limit).lean();
-  const total = await NaukriJob.countDocuments(query);
+  const [jobs, total] = await Promise.all([
+    NaukriJob.find(query).sort({ foundAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+    NaukriJob.countDocuments(query),
+  ]);
   return { jobs, total, page, limit };
 }
 

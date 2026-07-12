@@ -8,14 +8,14 @@ const icons = {
 };
 
 const colors = {
-  success: 'bg-green-50 border-green-200 text-green-800',
-  error: 'bg-red-50 border-red-200 text-red-800',
-  info: 'bg-blue-50 border-blue-200 text-blue-800',
+  success: 'bg-white/95 border-emerald-200 text-emerald-900 border-l-4 border-l-emerald-500',
+  error: 'bg-white/95 border-rose-200 text-rose-900 border-l-4 border-l-rose-500',
+  info: 'bg-white/95 border-blue-200 text-blue-900 border-l-4 border-l-blue-500',
 };
 
 const iconColors = {
-  success: 'text-green-500',
-  error: 'text-red-500',
+  success: 'text-emerald-500',
+  error: 'text-rose-500',
   info: 'text-blue-500',
 };
 
@@ -32,7 +32,7 @@ export default function ToastContainer() {
         return (
           <div
             key={toast.id}
-            className={`flex items-start gap-2 px-4 py-3 rounded-lg border shadow-lg text-sm animate-slide-in ${colors[toast.type] || colors.info}`}
+            className={`flex items-start gap-2 px-4 py-3 rounded-xl border backdrop-blur-md shadow-xl shadow-slate-900/10 text-sm animate-slide-in ${colors[toast.type] || colors.info}`}
           >
             <Icon size={18} className={`mt-0.5 shrink-0 ${iconColors[toast.type] || iconColors.info}`} />
             <span className="flex-1">{toast.message}</span>

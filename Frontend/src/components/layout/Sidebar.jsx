@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Search, Mail, MessageSquare, History, Settings, Users, LogOut, X, Briefcase, FileUp } from 'lucide-react';
+import { LayoutDashboard, Search, Mail, MessageSquare, History, Settings, Users, LogOut, X, Briefcase, FileUp, Zap } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuthStore } from '../../store/authStore';
 import { useStore } from '../../store';
@@ -36,18 +36,18 @@ export default function Sidebar({ mobileOpen, onClose }) {
   return (
     <>
       {/* Desktop sidebar - always visible */}
-      <aside className="hidden md:flex w-64 bg-gray-900 text-white min-h-screen flex-col flex-shrink-0">
+      <aside className="hidden md:flex w-64 bg-gradient-to-b from-slate-900 to-slate-950 text-white min-h-screen flex-col flex-shrink-0 border-r border-white/5">
         <SidebarContent user={user} onLogout={() => setShowConfirm(true)} />
       </aside>
 
       {/* Mobile sidebar - slide drawer */}
       <aside className={clsx(
-        'fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col transform transition-transform duration-200 ease-in-out md:hidden',
+        'fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-slate-900 to-slate-950 text-white flex flex-col transform transition-transform duration-200 ease-in-out md:hidden shadow-2xl',
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h1 className="text-lg font-bold">LinkedIn Dashboard</h1>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+          <Brand />
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -56,8 +56,8 @@ export default function Sidebar({ mobileOpen, onClose }) {
 
       {/* Logout confirm modal */}
       {showConfirm && (
-        <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-80">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-80 animate-scale-in">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Confirm Logout</h3>
             <p className="text-sm text-gray-600 mb-5">Are you sure you want to logout?</p>
             <div className="flex gap-3 justify-end">
@@ -75,16 +75,29 @@ export default function Sidebar({ mobileOpen, onClose }) {
   );
 }
 
+function Brand() {
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+        <Zap size={18} className="text-white" fill="currentColor" />
+      </div>
+      <div className="leading-tight">
+        <h1 className="text-base font-bold tracking-tight">LinkedIn Dash</h1>
+        <p className="text-[11px] text-slate-400">Job Automation</p>
+      </div>
+    </div>
+  );
+}
+
 function SidebarContent({ user, onLogout, hideHeader }) {
   return (
     <>
       {!hideHeader && (
-        <div className="p-6 border-b border-gray-700">
-          <h1 className="text-xl font-bold">LinkedIn Dashboard</h1>
-          <p className="text-gray-400 text-sm mt-1">Job Automation</p>
+        <div className="px-5 py-5 border-b border-white/10">
+          <Brand />
         </div>
       )}
-      <nav className="flex-1 py-4 overflow-y-auto">
+      <nav className="flex-1 py-4 px-3 overflow-y-auto space-y-1">
         {links.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -92,26 +105,40 @@ function SidebarContent({ user, onLogout, hideHeader }) {
             end={to === '/'}
             className={({ isActive }) =>
               clsx(
-                'flex items-center gap-3 px-6 py-3 text-sm transition-colors',
-                isActive ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                'group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
+                isActive
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-white'
               )
             }
           >
-            <Icon size={18} />
-            {label}
+            {({ isActive }) => (
+              <>
+                <span className={clsx(
+                  'absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-white transition-opacity',
+                  isActive ? 'opacity-90' : 'opacity-0'
+                )} />
+                <Icon size={18} className={clsx('shrink-0 transition-transform group-hover:scale-110', isActive && 'drop-shadow')} />
+                {label}
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
       {user && (
-        <div className="p-4 border-t border-gray-700">
-          <div className="mb-3">
-            <p className="text-sm font-medium text-white truncate">{user.name}</p>
-            <p className="text-xs text-gray-400 truncate">{user.email}</p>
+        <div className="p-3 border-t border-white/10">
+          <div className="flex items-center gap-3 rounded-xl bg-white/5 px-3 py-2.5">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+              {(user.name || '?')[0].toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-white truncate">{user.name}</p>
+              <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+            </div>
+            <button onClick={onLogout} title="Logout" className="text-slate-400 hover:text-red-400 transition-colors shrink-0">
+              <LogOut size={17} />
+            </button>
           </div>
-          <button onClick={onLogout} className="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition-colors w-full">
-            <LogOut size={16} />
-            Logout
-          </button>
         </div>
       )}
     </>

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+// BACKEND_URL = 'http://127.0.0.1:3001'
 const api = axios.create({ baseURL: `${BACKEND_URL}/api` });
 
 // Attach token to every request

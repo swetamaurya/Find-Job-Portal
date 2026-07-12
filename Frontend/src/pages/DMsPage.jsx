@@ -143,7 +143,7 @@ export default function DMsPage() {
       )}
 
       {/* DM Settings - Collapsible */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100">
         <button onClick={() => setShowSettings(!showSettings)} className="w-full flex items-center justify-between p-4 text-left">
           <h3 className="font-semibold text-gray-800">DM Settings</h3>
           {showSettings ? <ChevronDown size={18} className="text-gray-400" /> : <ChevronRight size={18} className="text-gray-400" />}
@@ -152,12 +152,20 @@ export default function DMsPage() {
           <div className="px-4 sm:px-5 pb-5 space-y-4 border-t border-gray-50 pt-4">
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm text-gray-600 mb-1">DM Message</label>
-                <textarea value={config.dmMessage || ''} onChange={(e) => updateConfig({ dmMessage: e.target.value })} rows={3} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm text-gray-600">DM Message</label>
+                  <span className="text-xs text-gray-400">{(config.dmMessage || '').length} chars</span>
+                </div>
+                <textarea value={config.dmMessage || ''} onChange={(e) => updateConfig({ dmMessage: e.target.value })} rows={6} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm leading-relaxed resize-y min-h-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Connection Note <span className="text-gray-400">(max 300)</span></label>
-                <textarea value={config.connectionNote || ''} onChange={(e) => updateConfig({ connectionNote: e.target.value })} rows={3} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm text-gray-600">Connection Note</label>
+                  <span className={`text-xs ${(config.connectionNote || '').length > 300 ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+                    {(config.connectionNote || '').length}/300
+                  </span>
+                </div>
+                <textarea value={config.connectionNote || ''} onChange={(e) => updateConfig({ connectionNote: e.target.value })} rows={4} maxLength={320} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm leading-relaxed resize-y min-h-[90px] focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -204,7 +212,7 @@ export default function DMsPage() {
       </div>
 
       {/* Profiles Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
         <div className="max-h-[500px] overflow-auto">
         <table className="w-full text-sm min-w-[400px]">
           <thead className="sticky top-0 z-10">

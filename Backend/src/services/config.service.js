@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const config = require('../config');
 const ExtractedResult = require('../models/ExtractedResult');
 const SentEmail = require('../models/SentEmail');
@@ -28,8 +29,10 @@ function generateDefaultConnectionNote(user) {
 }
 
 async function getConfig(userId) {
-  const cfg = await config.loadConfig(userId);
-  const user = await User.findById(userId).select('-password').lean();
+  const [cfg, user] = await Promise.all([
+    config.loadConfig(userId),
+    User.findById(userId).select('-password').lean(),
+  ]);
 
   if (!cfg.dmMessage && user) cfg.dmMessage = generateDefaultDM(user);
   if (!cfg.connectionNote && user) cfg.connectionNote = generateDefaultConnectionNote(user);
@@ -74,20 +77,29 @@ async function getStats(userId) {
   let connectSentCount = 0;
 
   try {
-    const data = await ExtractedResult.findOne({ userId }).lean();
-    if (data) {
-      totalEmails = (data.emails || []).length;
-      totalProfiles = (data.profiles || []).length;
+    // Run the independent reads in parallel. For ExtractedResult we compute the array
+    // sizes server-side with $size so we never transfer the (potentially huge) emails/
+    // profiles arrays just to count them — this was the main cause of the slow /stats.
+    const uid = new mongoose.Types.ObjectId(userId); // aggregate() doesn't auto-cast like find()/count()
+    const [sizeAgg, sent, dmSent, connectSent] = await Promise.all([
+      ExtractedResult.aggregate([
+        { $match: { userId: uid } },
+        { $project: {
+          totalEmails: { $size: { $ifNull: ['$emails', []] } },
+          totalProfiles: { $size: { $ifNull: ['$profiles', []] } },
+        } },
+      ]),
+      SentEmail.countDocuments({ userId }),
+      SentDM.countDocuments({ userId, status: 'dm_sent' }),
+      SentDM.countDocuments({ userId, status: 'connected' }),
+    ]);
+    if (sizeAgg && sizeAgg[0]) {
+      totalEmails = sizeAgg[0].totalEmails || 0;
+      totalProfiles = sizeAgg[0].totalProfiles || 0;
     }
-  } catch {}
-
-  try {
-    sentEmailsCount = await SentEmail.countDocuments({ userId });
-  } catch {}
-
-  try {
-    dmSentCount = await SentDM.countDocuments({ userId, status: 'dm_sent' });
-    connectSentCount = await SentDM.countDocuments({ userId, status: 'connected' });
+    sentEmailsCount = sent;
+    dmSentCount = dmSent;
+    connectSentCount = connectSent;
   } catch {}
 
   return { totalEmails, totalProfiles, sentEmailsCount, dmSentCount, connectSentCount };

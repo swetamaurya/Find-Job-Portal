@@ -3,9 +3,49 @@ const { isValidEmail, IGNORED_DOMAINS } = require('./email-extract.service');
 const { log, broadcast } = require('../websocket');
 const { loadConfig } = require('../config');
 const ExtractedResult = require('../models/ExtractedResult');
+const User = require('../models/User');
 
 // Per-user state
 const userState = new Map();
+
+// Generic role/hiring words that should NOT count as a skill match on their own.
+const GENERIC_TOKENS = new Set([
+  'hiring', 'looking', 'for', 'we', 'are', 'need', 'needed', 'urgent', 'urgently',
+  'immediate', 'joiner', 'developer', 'engineer', 'dev', 'job', 'jobs', 'opening',
+  'openings', 'position', 'positions', 'remote', 'fresher', 'senior', 'junior', 'sr',
+  'jr', 'required', 'requirement', 'wanted', 'multiple', 'role', 'roles', 'vacancy',
+  'the', 'and', 'with', 'in', 'at', 'of', 'to', 'a', 'an',
+]);
+
+// Build the list of skill/tech keywords a post must mention to be considered relevant.
+// Sources (in order): explicit cfg.matchKeywords → user's profile skills → tech tokens
+// pulled from the search queries (minus generic role/hiring words).
+function buildMatchKeywords(cfg, user) {
+  const out = new Set();
+  const addRaw = (raw) => {
+    if (!raw) return;
+    String(raw).split(/[,|/;\n]+/).forEach((tok) => {
+      const t = tok.trim().toLowerCase();
+      if (t.length < 2) return;
+      out.add(t);
+      if (t.includes('.')) out.add(t.replace(/\./g, ''));   // node.js → nodejs
+      if (t.includes(' ')) out.add(t.replace(/\s+/g, ''));  // "react native" → reactnative
+    });
+  };
+
+  (cfg.matchKeywords || []).forEach(addRaw);
+  if (user && user.profile) addRaw(user.profile.skills);
+
+  (cfg.searchQueries || []).forEach((q) => {
+    String(q).toLowerCase().split(/[^a-z0-9.+#]+/).forEach((w) => {
+      const t = w.trim();
+      if (t.length < 2 || GENERIC_TOKENS.has(t)) return;
+      out.add(t);
+    });
+  });
+
+  return Array.from(out);
+}
 
 function getState(userId) {
   const key = userId.toString();
@@ -34,13 +74,27 @@ function stopSearch(userId) {
   log('Search stop requested', userId);
 }
 
-async function extractFromPage(tabPage, skipKeywords, maxExp = 5) {
+async function extractFromPage(tabPage, skipKeywords, maxExp = 5, matchKeywords = [], requireMatch = false) {
   return tabPage.evaluate(
-    (ignoredDomains, skipKw, maxExpYears) => {
+    (ignoredDomains, skipKw, maxExpYears, matchKw, requireSkillMatch) => {
       const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
       const results = { emails: [], posts: [], profiles: [] };
-      const debug = { totalChunks: 0, tooShort: 0, skippedByKeyword: 0, jobSeekerSkip: 0, expSkip: 0, notJobRelated: 0, noEmails: 0, domainFiltered: 0, passed: 0, totalPosts: 0, postTooShort: 0, postSkipKw: 0, postJobSeeker: 0, postExpSkip: 0, postNotJob: 0, postNoProfile: 0, postNotRelevant: 0, postPassed: 0, rawEmailsOnPage: 0, rawEmailsList: [] };
+      const debug = { totalChunks: 0, tooShort: 0, skippedByKeyword: 0, jobSeekerSkip: 0, expSkip: 0, noSkillMatch: 0, notJobRelated: 0, noEmails: 0, domainFiltered: 0, passed: 0, totalPosts: 0, postTooShort: 0, postSkipKw: 0, postJobSeeker: 0, postExpSkip: 0, postNoSkillMatch: 0, postNotJob: 0, postNoProfile: 0, postNotRelevant: 0, postPassed: 0, rawEmailsOnPage: 0, rawEmailsList: [] };
       const fullPageText = document.body.innerText || '';
+
+      // Does the text mention one of the user's skills? Used for two things:
+      //  - overrideMatch(): a skip keyword is ignored if the post is about the user's tech
+      //    (falls back to the original hardcoded Node stack when no skills are configured).
+      //  - skillMatch(): the strict positive gate — only kept when requireSkillMatch is on.
+      function overrideMatch(lower) {
+        if (matchKw && matchKw.length) return matchKw.some((k) => lower.includes(k));
+        return lower.includes('node.js') || lower.includes('nodejs') ||
+          lower.includes('express.js') || lower.includes('expressjs') || lower.includes('mongodb');
+      }
+      function skillMatch(lower) {
+        if (!matchKw || matchKw.length === 0) return true; // nothing to match against → don't filter
+        return matchKw.some((k) => lower.includes(k));
+      }
 
       // Scan ALL emails on the page before any filtering
       const allRawEmails = fullPageText.match(emailRegex) || [];
@@ -64,6 +118,7 @@ async function extractFromPage(tabPage, skipKeywords, maxExp = 5) {
         const lower = text.toLowerCase();
         const expPatterns = [
           /(\d+)\s*[-–to]+\s*(\d+)\s*(?:years?|yrs?|yr)/gi,
+          /(?:min(?:imum)?(?:\s*of)?|at\s*least)\s*(\d+)\s*\+?\s*(?:years?|yrs?|yr)/gi,
           /(\d+)\s*\+?\s*(?:years?|yrs?|yr)\s*(?:of)?\s*(?:exp|experience)?/gi,
           /experience\s*[:.]?\s*(\d+)\s*[-–to]*\s*(\d*)\s*(?:years?|yrs?|yr)?/gi,
           /exp\s*[:.]?\s*(\d+)\s*[-–to]*\s*(\d*)\s*(?:years?|yrs?|yr)?/gi,
@@ -115,13 +170,10 @@ async function extractFromPage(tabPage, skipKeywords, maxExp = 5) {
         if (chunk.length < 80) { debug.tooShort++; return; }
         const lowerChunk = chunk.toLowerCase();
         const hasSkipKeyword = skipKw.some((kw) => lowerChunk.includes(kw.toLowerCase()));
-        const hasNodeSpecific =
-          lowerChunk.includes('node.js') || lowerChunk.includes('nodejs') ||
-          lowerChunk.includes('express.js') || lowerChunk.includes('expressjs') ||
-          lowerChunk.includes('mongodb');
-        if (hasSkipKeyword && !hasNodeSpecific) { debug.skippedByKeyword++; return; }
+        if (hasSkipKeyword && !overrideMatch(lowerChunk)) { debug.skippedByKeyword++; return; }
         if (isJobSeekerPost(chunk)) { debug.jobSeekerSkip++; return; }
         if (!isExperienceMatch(chunk)) { debug.expSkip++; return; }
+        if (requireSkillMatch && !skillMatch(lowerChunk)) { debug.noSkillMatch++; return; }
 
         const isJobRelated = jobKeywords.some((kw) => lowerChunk.includes(kw.toLowerCase()));
         const emails = chunk.match(emailRegex) || [];
@@ -172,13 +224,10 @@ async function extractFromPage(tabPage, skipKeywords, maxExp = 5) {
         if (text.length < 80) { debug.postTooShort++; return; }
         const lowerText = text.toLowerCase();
         const hasSkipKw = skipKw.some((kw) => lowerText.includes(kw.toLowerCase()));
-        const hasNodeSpecificKw =
-          lowerText.includes('node.js') || lowerText.includes('nodejs') ||
-          lowerText.includes('express.js') || lowerText.includes('expressjs') ||
-          lowerText.includes('mongodb');
-        if (hasSkipKw && !hasNodeSpecificKw) { debug.postSkipKw++; return; }
+        if (hasSkipKw && !overrideMatch(lowerText)) { debug.postSkipKw++; return; }
         if (isJobSeekerPost(text)) { debug.postJobSeeker++; return; }
         if (!isExperienceMatch(text)) { debug.postExpSkip++; return; }
+        if (requireSkillMatch && !skillMatch(lowerText)) { debug.postNoSkillMatch++; return; }
 
         let posterProfileUrl = '';
         let posterName = '';
@@ -270,7 +319,9 @@ async function extractFromPage(tabPage, skipKeywords, maxExp = 5) {
     },
     IGNORED_DOMAINS,
     skipKeywords,
-    maxExp
+    maxExp,
+    matchKeywords,
+    requireMatch
   );
 }
 
@@ -416,7 +467,13 @@ async function searchOneQuery(tabPage, query, cfg, state, userId) {
 
   let extracted;
   try {
-    extracted = await extractFromPage(tabPage, cfg.skipKeywords || [], cfg.maxExperience || 5);
+    extracted = await extractFromPage(
+      tabPage,
+      cfg.skipKeywords || [],
+      cfg.maxExperience || 5,
+      cfg._matchKeywords || [],
+      cfg.requireSkillMatch !== false
+    );
   } catch {
     extracted = { emails: [], posts: [], profiles: [] };
   }
@@ -424,8 +481,8 @@ async function searchOneQuery(tabPage, query, cfg, state, userId) {
   if (extracted._debug) {
     const d = extracted._debug;
     log(`[Debug] Raw emails on page: ${d.rawEmailsOnPage} → ${d.rawEmailsList.join(', ') || 'none'}`, userId);
-    log(`[Debug] Chunks: ${d.totalChunks} (tooShort:${d.tooShort} skipKw:${d.skippedByKeyword} jobSeeker:${d.jobSeekerSkip} exp:${d.expSkip} notJob:${d.notJobRelated} domainFiltered:${d.domainFiltered} passed:${d.passed})`, userId);
-    log(`[Debug] Posts: ${d.totalPosts} (tooShort:${d.postTooShort} skipKw:${d.postSkipKw} jobSeeker:${d.postJobSeeker} exp:${d.postExpSkip} notJob:${d.postNotJob} noProfile:${d.postNoProfile} notRelevant:${d.postNotRelevant} passed:${d.postPassed})`, userId);
+    log(`[Debug] Chunks: ${d.totalChunks} (tooShort:${d.tooShort} skipKw:${d.skippedByKeyword} jobSeeker:${d.jobSeekerSkip} exp:${d.expSkip} noSkill:${d.noSkillMatch} notJob:${d.notJobRelated} domainFiltered:${d.domainFiltered} passed:${d.passed})`, userId);
+    log(`[Debug] Posts: ${d.totalPosts} (tooShort:${d.postTooShort} skipKw:${d.postSkipKw} jobSeeker:${d.postJobSeeker} exp:${d.postExpSkip} noSkill:${d.postNoSkillMatch} notJob:${d.postNotJob} noProfile:${d.postNoProfile} notRelevant:${d.postNotRelevant} passed:${d.postPassed})`, userId);
     log(`[Debug] Result: ${extracted.emails.length} emails, ${extracted.posts.length} posts, ${(extracted.profiles || []).length} profiles`, userId);
     delete extracted._debug;
   }
@@ -476,6 +533,17 @@ async function startSearch(userId) {
   const allProfiles = [];
   const allJobs = [];
   const queries = cfg.searchQueries || [];
+
+  // Build skill/tech keywords for relevance filtering (from config + profile skills + queries).
+  const searchUser = await User.findById(userId).select('profile').lean();
+  cfg._matchKeywords = buildMatchKeywords(cfg, searchUser);
+  if (cfg.requireSkillMatch === false) {
+    log('Skill matching: OFF (keeping every hiring post regardless of tech)', userId);
+  } else if (cfg._matchKeywords.length) {
+    log(`Skill matching: ON — keeping posts about: ${cfg._matchKeywords.slice(0, 15).join(', ')}${cfg._matchKeywords.length > 15 ? ` (+${cfg._matchKeywords.length - 15} more)` : ''}`, userId);
+  } else {
+    log('Skill matching: no skills/keywords configured — add skills in your profile for sharper filtering', userId);
+  }
 
   // Pre-load sent data for real-time new/already-sent tracking
   const { loadSentEmails } = require('./email-send.service');

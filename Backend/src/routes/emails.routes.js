@@ -6,9 +6,11 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const data = await ExtractedResult.findOne({ userId: req.userId }).lean();
+    const [data, sentEmails] = await Promise.all([
+      ExtractedResult.findOne({ userId: req.userId }).lean(),
+      emailService.loadSentEmails(req.userId),
+    ]);
     if (!data) return res.json({ emails: [], totalPosts: 0 });
-    const sentEmails = await emailService.loadSentEmails(req.userId);
     const emails = (data.emails || []).map((e) => ({
       ...e,
       status: sentEmails.has(e.email.toLowerCase()) ? 'sent' : 'new',

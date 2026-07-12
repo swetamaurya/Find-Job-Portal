@@ -101,7 +101,7 @@ export default function HistoryPage() {
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
         <div className="max-h-[550px] overflow-auto">
           {tab === 'emails' && (
             <table className="w-full text-sm">

@@ -182,7 +182,7 @@ export default function NaukriPage() {
       {/* Config */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Keywords */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5">
           <h3 className="font-semibold text-gray-800 text-sm mb-3">Search Keywords <span className="text-gray-400 font-normal">{(config.naukriKeywords || []).length} keywords</span></h3>
           <div className="flex gap-2 mb-3">
             <input type="text" value={newKeyword} onChange={(e) => setNewKeyword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addKeyword()} placeholder="e.g. Node.js Developer" className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
@@ -199,7 +199,7 @@ export default function NaukriPage() {
         </div>
 
         {/* Locations + Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5">
           <h3 className="font-semibold text-gray-800 text-sm mb-3">Locations</h3>
           <div className="flex flex-wrap gap-1.5 mb-4">
             {LOCATIONS.map((loc) => {
@@ -230,7 +230,7 @@ export default function NaukriPage() {
       </div>
 
       {/* Jobs Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800 text-sm">Jobs <span className="text-gray-400 font-normal">{jobsTotal} total</span></h3>
           <div className="flex gap-1">

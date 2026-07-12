@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema({
     portfolioUrl: { type: String, default: '' },
   },
   resumeFilename: { type: String, default: '' },
+  lastLogin: { type: Date, default: null },
+  loginCount: { type: Number, default: 0 },
+  role: { type: String, enum: ['admin', 'user'], default: 'user' },
   createdAt: { type: Date, default: Date.now },
 }, { collection: 'users' });
 

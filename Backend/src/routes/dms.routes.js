@@ -20,9 +20,11 @@ const statusLabels = {
 
 router.get('/profiles', async (req, res) => {
   try {
-    const data = await ExtractedResult.findOne({ userId: req.userId }).lean();
+    const [data, sentDMs] = await Promise.all([
+      ExtractedResult.findOne({ userId: req.userId }).lean(),
+      dmService.loadSentDMs(req.userId),
+    ]);
     if (!data) return res.json({ profiles: [] });
-    const sentDMs = await dmService.loadSentDMs(req.userId);
 
     const profileMap = new Map();
     (data.profiles || []).forEach((p) => {

@@ -162,7 +162,7 @@ export default function EmailsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
         <div className="max-h-[500px] overflow-auto">
           <table className="w-full text-sm min-w-[400px]">
             <thead className="sticky top-0 z-10">

@@ -25,8 +25,23 @@ export default function SettingsPage() {
   const [showPreview, setShowPreview] = useState(false);
   const [showAppPassword, setShowAppPassword] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [openSection, setOpenSection] = useState('credentials');
   const addToast = useStore((s) => s.addToast);
+
+  const clearHistory = async () => {
+    setClearing(true);
+    try {
+      const r = await api.post('/history/clear');
+      const d = r.data.deleted || {};
+      const total = (d.emails || 0) + (d.dms || 0) + (d.naukriJobs || 0);
+      addToast(total > 0 ? `Cleared ${total} record${total > 1 ? 's' : ''} (${d.emails || 0} emails, ${d.dms || 0} DMs, ${d.naukriJobs || 0} jobs)` : 'History was already empty');
+      setConfirmClear(false);
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Failed to clear history', 'error');
+    }
+    setClearing(false);
+  };
 
   const toggle = (name) => setOpenSection((prev) => prev === name ? null : name);
 
@@ -204,10 +219,12 @@ export default function SettingsPage() {
             <Trash2 size={16} /> Clear History
           </button>
         ) : (
-          <div className="flex items-center gap-3 bg-red-50 rounded-lg px-4 py-3">
-            <p className="text-sm text-red-700">Are you sure? This will clear all sent email history.</p>
-            <button onClick={() => { api.put('/config', {}).then(() => { addToast('History cleared'); setConfirmClear(false); window.location.reload(); }).catch(() => addToast('Failed to clear history', 'error')); }} className="bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-1.5 text-sm font-medium whitespace-nowrap">Yes, Clear</button>
-            <button onClick={() => setConfirmClear(false)} className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg px-4 py-1.5 text-sm font-medium">Cancel</button>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-red-50 rounded-lg px-4 py-3">
+            <p className="text-sm text-red-700">Delete all sent emails, DMs, extracted results and Naukri jobs? This cannot be undone.</p>
+            <div className="flex gap-2">
+              <button onClick={clearHistory} disabled={clearing} className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg px-4 py-1.5 text-sm font-medium whitespace-nowrap">{clearing ? 'Clearing...' : 'Yes, Clear'}</button>
+              <button onClick={() => setConfirmClear(false)} disabled={clearing} className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg px-4 py-1.5 text-sm font-medium">Cancel</button>
+            </div>
           </div>
         )}
       </Section>

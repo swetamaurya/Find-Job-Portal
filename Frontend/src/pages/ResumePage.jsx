@@ -94,7 +94,7 @@ export default function ResumePage() {
       </h2>
 
       {/* Resume Upload Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5 space-y-4">
         <h3 className="font-semibold text-gray-800 flex items-center gap-2">
           <FileUp size={18} className="text-cyan-500" /> Upload Resume
         </h3>
@@ -117,7 +117,7 @@ export default function ResumePage() {
       </div>
 
       {/* Profile Info Section (auto-filled from resume) */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5 space-y-4">
         <h3 className="font-semibold text-gray-800 flex items-center gap-2">
           <User size={18} className="text-purple-500" /> Profile Info
         </h3>

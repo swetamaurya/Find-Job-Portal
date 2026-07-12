@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Play, Square, Plus, X, MapPin, Search, Filter, SlidersHorizontal, RefreshCw } from 'lucide-react';
+import { Play, Square, Plus, X, MapPin, Search, Filter, SlidersHorizontal, RefreshCw, Target } from 'lucide-react';
 import api from '../lib/api';
 import ProgressBar from '../components/common/ProgressBar';
 import LiveLog from '../components/common/LiveLog';
@@ -19,6 +19,7 @@ export default function SearchPage() {
   const [config, setConfig] = useState(null);
   const [newQuery, setNewQuery] = useState('');
   const [newSkip, setNewSkip] = useState('');
+  const [newMatch, setNewMatch] = useState('');
   const searchProgress = useStore((s) => s.searchProgress);
   const setSearchProgress = useStore((s) => s.setSearchProgress);
   const browserStatus = useStore((s) => s.browserStatus);
@@ -61,6 +62,18 @@ export default function SearchPage() {
   const removeSkipKeyword = (index) => {
     const keywords = config.skipKeywords.filter((_, i) => i !== index);
     saveConfig({ skipKeywords: keywords });
+  };
+
+  const addMatchKeyword = () => {
+    if (!newMatch.trim()) return;
+    const keywords = [...(config.matchKeywords || []), newMatch.trim().toLowerCase()];
+    saveConfig({ matchKeywords: keywords });
+    setNewMatch('');
+  };
+
+  const removeMatchKeyword = (index) => {
+    const keywords = (config.matchKeywords || []).filter((_, i) => i !== index);
+    saveConfig({ matchKeywords: keywords });
   };
 
   const startSearch = async () => {
@@ -164,7 +177,7 @@ export default function SearchPage() {
       {/* Queries + Skip Keywords - 2 column */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Search Queries */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-gray-800 text-sm">Search Queries</h3>
             <span className="text-xs text-gray-400">{(config.searchQueries || []).length} queries</span>
@@ -190,7 +203,7 @@ export default function SearchPage() {
         </div>
 
         {/* Skip Keywords */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-semibold text-gray-800 text-sm">Skip Keywords</h3>
             <span className="text-xs text-gray-400">{(config.skipKeywords || []).length} keywords</span>
@@ -215,8 +228,41 @@ export default function SearchPage() {
         </div>
       </div>
 
+      {/* Match Keywords */}
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+            <Target size={15} className="text-green-500" /> Match Keywords <span className="text-xs font-normal text-gray-400">(your skills / tech)</span>
+          </h3>
+          <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
+            <input type="checkbox" checked={config.requireSkillMatch !== false} onChange={(e) => saveConfig({ requireSkillMatch: e.target.checked })} className="rounded" />
+            Only relevant matches
+          </label>
+        </div>
+        <p className="text-[11px] text-gray-400 mb-3">Keep only posts mentioning at least one of these. Leave empty to auto-use your profile skills + query terms.</p>
+        <div className="flex gap-2 mb-3">
+          <input type="text" value={newMatch} onChange={(e) => setNewMatch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addMatchKeyword()} placeholder="Add skill / tech keyword..." className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400" />
+          <button onClick={addMatchKeyword} className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-2.5 py-1.5">
+            <Plus size={16} />
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-1.5 max-h-32 overflow-auto">
+          {(config.matchKeywords || []).map((kw, i) => (
+            <span key={i} className="inline-flex items-center gap-1 bg-green-50 text-green-700 rounded-full px-2.5 py-0.5 text-xs group">
+              {kw}
+              <button onClick={() => removeMatchKeyword(i)} className="text-green-300 hover:text-green-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                <X size={11} />
+              </button>
+            </span>
+          ))}
+          {(config.matchKeywords || []).length === 0 && (
+            <span className="text-xs text-gray-300">No keywords — using your profile skills automatically</span>
+          )}
+        </div>
+      </div>
+
       {/* Filters Row */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5">
         <h3 className="font-semibold text-gray-800 text-sm flex items-center gap-2 mb-4">
           <SlidersHorizontal size={16} className="text-gray-500" /> Search Filters
         </h3>
